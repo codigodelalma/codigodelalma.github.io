@@ -42,7 +42,10 @@ const csp = html.match(/http-equiv="Content-Security-Policy" content="([^"]+)"/)
 for (const rule of ["default-src 'none'", "connect-src 'none'", "form-action 'none'"]) {
   if (!csp.includes(rule)) problems.push(`dist/index.html: la CSP no incluye ${rule}`)
 }
-for (const m of html.matchAll(/(?:src|href)="(https?:)?\/\/[^"]+"/g)) problems.push(`dist/index.html: recurso externo ${m[0]}`)
+// Solo se permite el propio dominio (enlace canónico)
+for (const m of html.matchAll(/(?:src|href)="(?:https?:)?\/\/(?!codigodelalma\.github\.io\/)[^"]+"/g)) {
+  problems.push(`dist/index.html: recurso externo ${m[0]}`)
+}
 
 if (problems.length) {
   console.error('✗ Verificación de privacidad fallida:\n  ' + problems.join('\n  '))

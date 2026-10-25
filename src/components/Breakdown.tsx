@@ -1,5 +1,5 @@
 import type { Profile } from '../lib/numerology.ts'
-import type { PositionKey } from '../data/numerology.ts'
+import { NUMBERS, type PositionKey } from '../data/numerology.ts'
 
 const chain = (xs: number[]) => xs.join(' → ')
 
@@ -62,6 +62,19 @@ export function Breakdown({ profile, position }: { profile: Profile; position: P
               <p className="bd-sum">
                 {values.length ? values.join(' + ') : '0'} = <strong>{chain(red.chain)}</strong>
               </p>
+              {red.value > 0 && (
+                <p className="bd-meaning">
+                  <span className="bd-chip" data-n={red.value}>
+                    {red.value}
+                  </span>
+                  <span>
+                    <b>{NUMBERS[red.value].archetype}.</b>{' '}
+                    {vowels
+                      ? `«${w.word}» aporta a tu alma el deseo de ${NUMBERS[red.value].essence}.`
+                      : `«${w.word}» te hace proyectar ${NUMBERS[red.value].keywords.slice(0, 2).join(' y ').toLowerCase()}.`}
+                  </span>
+                </p>
+              )}
             </div>
           )
         })}

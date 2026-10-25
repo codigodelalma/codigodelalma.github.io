@@ -53,6 +53,8 @@ export interface WordInfo {
   consonantValues: number[]
   vowels: Reduction
   consonants: Reduction
+  /** Todas las letras del nombre: el número propio de esa palabra */
+  total: Reduction
 }
 
 /** Quita acentos (Á→A, Ü→U, Ñ→N) dejando solo A–Z. */
@@ -91,6 +93,7 @@ export function analyzeWord(word: string): WordInfo {
     consonantValues,
     vowels: reduce(sum(vowelValues)),
     consonants: reduce(sum(consonantValues)),
+    total: reduce(sum(letters.map((l) => l.value))),
   }
 }
 

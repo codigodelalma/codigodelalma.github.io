@@ -1492,6 +1492,7 @@ select:focus {
 
 /* ---------- Luna y sol ---------- */
 .celestial {
+  --size: clamp(110px, 11vw, 180px);
   position: absolute;
   top: 64px;
   left: 0;
@@ -1507,23 +1508,34 @@ main,
   z-index: 1;
 }
 
-.moon,
-.sun {
+.orbit {
   position: absolute;
   top: 0;
-  width: clamp(110px, 11vw, 180px);
+  width: var(--size);
+}
+
+.orbit-moon {
+  left: clamp(8px, 4vw, 80px);
+}
+
+.orbit-sun {
+  right: clamp(8px, 4vw, 80px);
+}
+
+.moon,
+.sun {
+  display: block;
+  width: 100%;
   height: auto;
   overflow: visible;
 }
 
 .moon {
-  left: clamp(8px, 4vw, 80px);
   animation: float 9s ease-in-out infinite;
   filter: drop-shadow(0 0 22px rgba(233, 225, 255, 0.35));
 }
 
 .sun {
-  right: clamp(8px, 4vw, 80px);
   animation: float 11s ease-in-out infinite reverse;
   filter: drop-shadow(0 0 28px rgba(255, 196, 92, 0.45));
 }
@@ -1568,16 +1580,39 @@ main,
   }
 }
 
-/* Sin espacio a los lados: más pequeños y el contenido empieza debajo */
-@media (max-width: 1279px) {
-  .moon,
-  .sun {
-    width: 76px;
+/* Pantallas anchas: acompañan el scroll por el centro de cada margen lateral, nunca sobre el texto */
+@media (min-width: 1440px) {
+  .celestial {
+    --gutter: calc((100vw - 1120px) / 2);
+    --size: min(170px, calc(var(--gutter) - 48px));
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    height: auto;
   }
-  .moon {
+  .orbit {
+    top: calc(84px + var(--p, 0) * (100vh - var(--size) - 130px));
+    will-change: top;
+  }
+  .orbit-moon {
+    left: calc(var(--gutter) / 2 - var(--size) / 2);
+    transform: rotate(calc(var(--p, 0) * -25deg));
+  }
+  .orbit-sun {
+    right: calc(var(--gutter) / 2 - var(--size) / 2);
+    transform: scale(calc(1 - var(--p, 0) * 0.12));
+  }
+}
+
+/* Sin espacio a los lados: más pequeños, arriba, y el contenido empieza debajo */
+@media (max-width: 1439px) {
+  .celestial {
+    --size: 76px;
+  }
+  .orbit-moon {
     left: 16px;
   }
-  .sun {
+  .orbit-sun {
     right: 16px;
   }
   .hero {
@@ -1776,4 +1811,203 @@ main,
 .incl-n,
 .tile b {
   font-variant-numeric: lining-nums;
+}
+
+/* ---------- Significado por nombre ---------- */
+.bd-meaning {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  margin: 10px 0 0;
+  padding-top: 10px;
+  border-top: 1px solid var(--glass-brd);
+  font-size: 0.9rem;
+  color: var(--ink-soft);
+}
+
+.bd-meaning b {
+  color: var(--ink);
+}
+
+.bd-chip {
+  --c1: var(--gold);
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  font: 700 1rem var(--display);
+  font-variant-numeric: lining-nums;
+  color: #fff;
+  background: #15112f;
+  box-shadow: inset 0 0 0 1.5px var(--c1), 0 0 12px -4px var(--c1);
+}
+
+.name-words {
+  display: grid;
+  gap: 16px;
+}
+
+@media (min-width: 760px) {
+  .name-words {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.name-card {
+  padding: 22px 20px;
+}
+
+.name-card header {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.name-card h3 {
+  margin: 0;
+  font-size: 1.8rem;
+}
+
+.name-orb {
+  width: 64px;
+  font-size: 2.2rem;
+  margin: 0;
+}
+
+.name-orb::after {
+  inset: -5px;
+}
+
+.name-arch {
+  margin: 0;
+  color: var(--gold);
+  font: italic 500 1.15rem var(--display);
+}
+
+.name-sum {
+  font-size: 0.9rem;
+  color: var(--ink-mute);
+  overflow-wrap: anywhere;
+}
+
+.name-sum strong {
+  color: var(--gold);
+}
+
+.name-card > p {
+  color: var(--ink-soft);
+}
+
+.name-card em {
+  color: var(--gold);
+  font-style: normal;
+}
+
+.name-split {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 18px;
+  margin: 10px 0 0;
+  font-size: 0.85rem;
+  color: var(--ink-mute);
+}
+
+.name-split b {
+  color: var(--ink);
+}
+
+.name-master {
+  color: #c8b8ff;
+}
+
+/* ---------- Invitación del mes ---------- */
+.hb-mission {
+  padding: 26px 20px;
+  display: grid;
+  gap: 14px;
+}
+
+@media (min-width: 640px) {
+  .hb-mission {
+    padding: 34px 40px;
+  }
+}
+
+.hb-mission h3 {
+  margin: 0;
+  font-size: clamp(1.6rem, 4vw, 2.2rem);
+}
+
+.hb-mission .eyebrow {
+  margin: 0;
+}
+
+.hb-attrs {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  margin: 0;
+}
+
+@media (min-width: 760px) {
+  .hb-attrs {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.hb-attrs > div {
+  padding: 14px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.035);
+  border: 1px solid var(--glass-brd);
+  text-align: center;
+}
+
+.hb-attrs dt {
+  font-size: 0.72rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-mute);
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.hb-attrs dd {
+  margin: 0;
+  display: grid;
+  gap: 2px;
+  font-weight: 600;
+}
+
+.hb-attr-he {
+  font-family: var(--hebrew);
+  font-size: 1.7rem;
+  line-height: 1.2;
+  color: var(--gold);
+  text-shadow: 0 0 18px rgba(242, 207, 134, 0.35);
+}
+
+@media (min-width: 900px) {
+  .hb-attrs {
+    grid-template-columns: repeat(5, 1fr);
+  }
+}
+
+@media (max-width: 759px) {
+  .hb-attrs > div:last-child {
+    grid-column: span 2;
+  }
+}
+
+.hb-stone {
+  margin: 0;
+  font-size: 0.95rem;
+  color: var(--ink-soft);
+}
+
+.hb-stone b {
+  color: var(--ink);
 }

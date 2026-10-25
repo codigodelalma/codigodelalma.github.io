@@ -1,4 +1,7 @@
-/** Luna y sol decorativos del encabezado. Solo SVG y CSS: sin imágenes externas. */
+import { useEffect, useRef } from 'react'
+
+/** Luna y sol decorativos. Solo SVG y CSS: sin imágenes externas.
+ *  En pantallas anchas acompañan el scroll por los márgenes laterales (variable --p de 0 a 1). */
 
 function Moon() {
   return (
@@ -72,10 +75,54 @@ function Sun() {
 }
 
 export function Celestial() {
+  const ref = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const el = ref.current!
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    let current = 0
+    let target = 0
+    let raf = 0
+
+    const progress = () => {
+      const max = document.documentElement.scrollHeight - window.innerHeight
+      return max > 0 ? Math.min(1, Math.max(0, window.scrollY / max)) : 0
+    }
+
+    // Interpolación suave: la luna y el sol "flotan" hacia su posición en vez de saltar
+    const step = () => {
+      current += (target - current) * 0.08
+      if (Math.abs(target - current) < 0.0005) current = target
+      el.style.setProperty('--p', current.toFixed(4))
+      raf = current === target ? 0 : requestAnimationFrame(step)
+    }
+
+    const onScroll = () => {
+      target = progress()
+      if (reduced) {
+        current = target
+        el.style.setProperty('--p', current.toFixed(4))
+      } else if (!raf) raf = requestAnimationFrame(step)
+    }
+
+    onScroll()
+    window.addEventListener('scroll', onScroll, { passive: true })
+    window.addEventListener('resize', onScroll)
+    return () => {
+      cancelAnimationFrame(raf)
+      window.removeEventListener('scroll', onScroll)
+      window.removeEventListener('resize', onScroll)
+    }
+  }, [])
+
   return (
-    <div className="celestial" aria-hidden="true">
-      <Moon />
-      <Sun />
+    <div className="celestial" ref={ref} aria-hidden="true">
+      <div className="orbit orbit-moon">
+        <Moon />
+      </div>
+      <div className="orbit orbit-sun">
+        <Sun />
+      </div>
     </div>
   )
 }

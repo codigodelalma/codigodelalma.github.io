@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react'
 import type { BirthDate } from '../lib/numerology.ts'
 import { hebrewBirthDate, hebrewNumeral, isLeapYear, nextHebrewBirthday } from '../lib/hebrewDate.ts'
 import { BIRTHDAY_CUSTOM, BIRTHDAY_RULES, HEBREW_DAY_SOURCES, HEBREW_MONTHS } from '../data/hebrewMonths.ts'
+import { MONTH_KABBALAH, MONTH_KABBALAH_NOTE, STONE_NOTE } from '../data/monthKabbalah.ts'
 import { SourceList } from './SourceList.tsx'
 
 const civil = new Intl.DateTimeFormat('es', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' })
@@ -9,11 +10,18 @@ const civilShort = new Intl.DateTimeFormat('es', { day: 'numeric', month: 'long'
 
 const ordinal = (n: number) => `${n}.º`
 
+/** «El oído» → «del oído» · «La risa» → «de la risa» */
+const ofFaculty = (faculty: string) => {
+  const lower = faculty.toLowerCase()
+  return lower.startsWith('el ') ? `del ${lower.slice(3)}` : `de ${lower}`
+}
+
 export function HebrewBirth({ date }: { date: BirthDate }) {
   const [afterSunset, setAfterSunset] = useState(false)
   const h = useMemo(() => hebrewBirthDate(date, afterSunset), [date, afterSunset])
   const next = useMemo(() => nextHebrewBirthday(h), [h])
   const m = HEBREW_MONTHS[h.month]
+  const k = MONTH_KABBALAH[h.month]
   const hebrewText = `${hebrewNumeral(h.day)} ב${m.hebrew} ${hebrewNumeral(h.year, true)}`
   const nextMonth = next && HEBREW_MONTHS[next.hebrew.month]
   const eve = next && new Date(next.date.getTime() - 86_400_000)
@@ -35,10 +43,71 @@ export function HebrewBirth({ date }: { date: BirthDate }) {
         </label>
         <p className="note">
           En el calendario judío el día empieza al anochecer («y fue la tarde y fue la mañana»). Si naciste de noche, tu
-          fecha hebrea es la del día siguiente. Si naciste justo entre la puesta del sol y la salida de las estrellas, la
-          fecha es dudosa: lo indicado es consultar a un rabino.
+          fecha hebrea es la del día siguiente.
         </p>
         <SourceList sources={HEBREW_DAY_SOURCES} />
+      </div>
+
+      <div className="hb-mission glass reveal">
+        <p className="eyebrow">La invitación de tu mes</p>
+        <h3>Naciste en {m.name}: el mes {ofFaculty(k.faculty)}</h3>
+        <dl className="hb-attrs">
+          <div>
+            <dt>Letra</dt>
+            <dd>
+              <span className="hb-attr-he" lang="he">
+                {k.letter}
+              </span>
+              {k.letterName}
+            </dd>
+          </div>
+          <div>
+            <dt>Facultad</dt>
+            <dd>
+              <span className="hb-attr-he" lang="he">
+                {k.facultyHe}
+              </span>
+              {k.faculty}
+            </dd>
+          </div>
+          <div>
+            <dt>Tribu</dt>
+            <dd>
+              <span className="hb-attr-he" lang="he">
+                {k.tribeHe}
+              </span>
+              {k.tribe}
+            </dd>
+          </div>
+          <div>
+            <dt>Piedra de la tribu</dt>
+            <dd>
+              <span className="hb-attr-he" lang="he">
+                {k.stoneHe}
+              </span>
+              {k.stone}
+            </dd>
+          </div>
+          <div>
+            <dt>Constelación</dt>
+            <dd>{k.sign}</dd>
+          </div>
+        </dl>
+        <p className="hb-stone">
+          <b>
+            {k.stone}, la piedra de {k.tribe}:
+          </b>{' '}
+          identificada tradicionalmente como {k.stoneId}.
+        </p>
+        <div className="lesson-box">
+          <h4>Tu misión según el mes</h4>
+          <p>{k.invitation}</p>
+        </div>
+        <SourceList sources={k.sources} />
+        <p className="note">{STONE_NOTE.text}</p>
+        <SourceList sources={STONE_NOTE.sources} />
+        <p className="note">{MONTH_KABBALAH_NOTE.text}</p>
+        <SourceList sources={MONTH_KABBALAH_NOTE.sources} />
       </div>
 
       <div className="hb-grid">

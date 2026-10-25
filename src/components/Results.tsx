@@ -6,6 +6,7 @@ import { NumberSection } from './NumberSection.tsx'
 import { TreeOfLife } from './TreeOfLife.tsx'
 import { HebrewBirth } from './HebrewBirth.tsx'
 import { ResultsNav, type NavItem } from './ResultsNav.tsx'
+import { NameWords } from './NameWords.tsx'
 
 const MONTHS = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre']
 
@@ -181,8 +182,9 @@ export function Results({ profile, onReset }: { profile: Profile; onReset: () =>
       <Part
         index={4}
         title="Las letras de tu nombre"
-        intro="Cuántas letras de tu nombre vibran en cada número, y qué cualidades te pide desarrollar esta vida."
+        intro="El número propio de cada uno de tus nombres y apellidos, cuántas letras vibran en cada número y qué cualidades te pide desarrollar esta vida."
       >
+        <NameWords words={profile.words} />
         <div className="karmic glass reveal">
           <div className="incl-grid">
             {profile.inclusion.map((count, i) => (
