@@ -1,0 +1,11 @@
+// Fuentes alojadas en el propio sitio: sin peticiones a terceros (privacidad y CSP estricta).
+import '@fontsource/cormorant-garamond/latin-500.css'
+import '@fontsource/cormorant-garamond/latin-600.css'
+import '@fontsource/cormorant-garamond/latin-700.css'
+import '@fontsource/cormorant-garamond/latin-500-italic.css'
+import '@fontsource/cormorant-garamond/latin-600-italic.css'
+import '@fontsource/inter/latin-400.css'
+import '@fontsource/inter/latin-500.css'
+import '@fontsource/inter/latin-600.css'
+import '@fontsource/frank-ruhl-libre/hebrew-500.css'
+import '@fontsource/frank-ruhl-libre/hebrew-700.css'
