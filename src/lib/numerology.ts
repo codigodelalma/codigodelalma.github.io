@@ -117,9 +117,13 @@ export interface Profile {
   lifeLesson: Reduction & { digits: number[] }
   soul: Reduction & { parts: number[] }
   personality: Reduction & { parts: number[] }
-  destiny: Reduction & { parts: number[] }
+  /** display: el número que se muestra (11 se conserva como número maestro en el destino) */
+  destiny: Reduction & { parts: number[]; display: number }
   birthDay: Reduction
+  /** Año personal (Hans Decoz): día + mes de nacimiento + año del calendario en curso */
   personalYear: Reduction & { year: number; digits: number[] }
+  /** Año universal (Hans Decoz): los dígitos del año en curso (2026 → 10 → 1) */
+  universalYear: Reduction & { year: number }
   /** Cuántas letras del nombre tienen cada valor 1–9 (índice 0 = valor 1) */
   inclusion: number[]
   /** Valores 1–9 ausentes en el nombre */
@@ -150,7 +154,9 @@ export function buildProfile(name: string, date: BirthDate, today = new Date()):
   const personality = { ...reduce(persParts.reduce((a, b) => a + b, 0)), parts: persParts }
 
   const destinyParts = [soul.value, personality.value]
-  const destiny = { ...reduce(soul.value + personality.value), parts: destinyParts }
+  const destinyRed = reduce(soul.value + personality.value)
+  // Número maestro: si alma + personalidad suman 11, el destino se muestra como 11 (Hans Decoz: no se reduce)
+  const destiny = { ...destinyRed, parts: destinyParts, display: destinyRed.chain[0] === 11 ? 11 : destinyRed.value }
 
   const currentYear = today.getFullYear()
   const pyDigits = dateDigits({ day: date.day, month: date.month, year: currentYear })
@@ -159,6 +165,7 @@ export function buildProfile(name: string, date: BirthDate, today = new Date()):
     year: currentYear,
     digits: pyDigits,
   }
+  const universalYear = { ...reduce(digitSum(currentYear)), year: currentYear }
 
   const inclusion = Array.from({ length: 9 }, () => 0)
   for (const w of words) for (const l of w.letters) inclusion[l.value - 1]++
@@ -174,6 +181,7 @@ export function buildProfile(name: string, date: BirthDate, today = new Date()):
     destiny,
     birthDay: reduce(date.day),
     personalYear,
+    universalYear,
     inclusion,
     karmicLessons,
   }

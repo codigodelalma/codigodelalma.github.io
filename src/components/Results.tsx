@@ -1,10 +1,12 @@
-import { useState, type ReactNode } from 'react'
+import { useMemo, useState, type ReactNode } from 'react'
 import type { Profile } from '../lib/numerology.ts'
 import { NUMBERS, POSITIONS, type PositionKey } from '../data/numerology.ts'
 import { SEFIROT } from '../data/tradition.ts'
 import { NumberSection } from './NumberSection.tsx'
 import { TreeOfLife } from './TreeOfLife.tsx'
 import { HebrewBirth } from './HebrewBirth.tsx'
+import { Purpose } from './Purpose.tsx'
+import { hebrewBirthDate } from '../lib/hebrewDate.ts'
 import { ResultsNav, type NavItem } from './ResultsNav.tsx'
 import { NameWords } from './NameWords.tsx'
 
@@ -18,6 +20,7 @@ const PARTS: NavItem[] = [
   { id: 'parte-hebrea', label: 'Fecha hebrea' },
   { id: 'parte-arbol', label: 'Árbol de la Vida' },
   { id: 'parte-nombre', label: 'Tu nombre' },
+  { id: 'parte-mision', label: 'Para qué viniste' },
   { id: 'parte-guardar', label: 'Guardar' },
 ]
 
@@ -39,6 +42,8 @@ function Part({ index, title, intro, children }: { index: number; title: string;
 
 export function Results({ profile, onReset }: { profile: Profile; onReset: () => void }) {
   const [copied, setCopied] = useState(false)
+  const [afterSunset, setAfterSunset] = useState(false)
+  const hebrew = useMemo(() => hebrewBirthDate(profile.date, afterSunset), [profile.date, afterSunset])
   const values: Record<PositionKey, number> = {
     leccion: profile.lifeLesson.value,
     alma: profile.soul.value,
@@ -98,7 +103,7 @@ export function Results({ profile, onReset }: { profile: Profile; onReset: () =>
           {ORDER.map((k, i) => (
             <a key={k} href={`#sec-${k}`} className="orb-card" style={{ animationDelay: `${i * 120}ms` }}>
               <span className="orb" data-n={values[k]}>
-                {values[k]}
+                {k === 'destino' ? profile.destiny.display : values[k]}
               </span>
               <span className="orb-title">{POSITIONS[k].title}</span>
               <span className="orb-sub">{NUMBERS[values[k]].archetype}</span>
@@ -117,10 +122,35 @@ export function Results({ profile, onReset }: { profile: Profile; onReset: () =>
             <span className="mini-n">{profile.personalYear.value}</span>
             <span>
               <b>Año personal {profile.personalYear.year}</b>
-              <small>{Y.archetype}</small>
+              <small>
+                {Y.archetype} · día + mes + {profile.personalYear.year}
+              </small>
+            </span>
+          </div>
+          <div className="mini glass">
+            <span className="mini-n">{profile.universalYear.value}</span>
+            <span>
+              <b>Año universal {profile.universalYear.year}</b>
+              <small>
+                {NUMBERS[profile.universalYear.value].archetype} · el año para todas las personas
+              </small>
             </span>
           </div>
         </div>
+        <p className="note mini-source">
+          Año personal y año universal según Hans Decoz:{' '}
+          <a href="https://www.worldnumerology.com/numerology-personal-year/" target="_blank" rel="noopener noreferrer">
+            Personal Year
+          </a>{' '}
+          ·{' '}
+          <a
+            href="https://www.worldnumerology.com/numerology-articles/2026-numerology-forecast-and-predictions.html"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Universal Year
+          </a>
+        </p>
 
         <div className="synthesis glass reveal">
           <p className="eyebrow">Tu lección de vida en breve</p>
@@ -162,7 +192,7 @@ export function Results({ profile, onReset }: { profile: Profile; onReset: () =>
         title="Tu fecha de nacimiento en el calendario hebreo"
         intro="El día y el mes judíos en que naciste, qué se celebra en ese mes y cuándo es tu próximo cumpleaños hebreo."
       >
-        <HebrewBirth date={profile.date} />
+        <HebrewBirth date={profile.date} afterSunset={afterSunset} onAfterSunset={setAfterSunset} />
       </Part>
 
       <Part
@@ -217,6 +247,14 @@ export function Results({ profile, onReset }: { profile: Profile; onReset: () =>
 
       <Part
         index={5}
+        title="Para qué viniste"
+        intro="Lo que enseñan las fuentes judías sobre la misión de cada alma, y cómo se reflejan en tus propios números."
+      >
+        <Purpose profile={profile} hebrew={hebrew} />
+      </Part>
+
+      <Part
+        index={6}
         title="Guarda tu resultado"
         intro="Descárgalo como PDF o compártelo. Todo ocurre en tu dispositivo: no guardamos nada."
       >

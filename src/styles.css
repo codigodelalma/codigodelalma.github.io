@@ -2012,3 +2012,177 @@ main,
 .hb-stone b {
   color: var(--ink);
 }
+
+/* Ecuación alma + personalidad = destino del nombre */
+.name-eq {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr auto 1.1fr;
+  align-items: stretch;
+  gap: 6px;
+  margin: 6px 0 12px;
+}
+
+.name-part {
+  display: grid;
+  justify-items: center;
+  align-content: center;
+  gap: 2px;
+  padding: 10px 6px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.035);
+  border: 1px solid var(--glass-brd);
+  text-align: center;
+}
+
+.name-part small {
+  font-size: 0.62rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-mute);
+  font-weight: 600;
+}
+
+.name-part b {
+  font: 700 1.5rem var(--display);
+  font-variant-numeric: lining-nums;
+  line-height: 1.1;
+}
+
+.name-part em {
+  font-size: 0.75rem;
+  color: var(--ink-soft);
+  font-style: normal;
+}
+
+.name-part.total {
+  border-color: rgba(242, 207, 134, 0.45);
+  background: rgba(242, 207, 134, 0.07);
+}
+
+.name-part.total b {
+  color: var(--gold);
+}
+
+.name-op {
+  align-self: center;
+  font: 700 1.2rem var(--display);
+  color: var(--ink-mute);
+}
+
+@media (max-width: 420px) {
+  .name-eq {
+    grid-template-columns: 1fr auto 1fr;
+  }
+  .name-eq .name-op:nth-of-type(4),
+  .name-part.total {
+    grid-column: 1 / -1;
+  }
+  .name-eq .name-op:nth-of-type(4) {
+    justify-self: center;
+  }
+}
+
+@media (min-width: 900px) {
+  .mini-stats {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.mini-source {
+  margin: -6px 0 0;
+  text-align: center;
+}
+
+.hb-psalm {
+  padding: 24px 20px;
+  text-align: center;
+  border-color: rgba(139, 108, 255, 0.4);
+}
+
+.hb-psalm p {
+  color: var(--ink-soft);
+}
+
+.btn-sm {
+  padding: 9px 18px;
+  font-size: 0.9rem;
+  text-decoration: none;
+}
+
+@media (min-width: 900px) {
+  .hb-grid {
+    grid-template-columns: 1.4fr 1fr;
+  }
+  .hb-grid .hb-month {
+    grid-row: span 2;
+  }
+}
+
+/* ---------- Para qué viniste ---------- */
+.purpose {
+  display: grid;
+  gap: 18px;
+}
+
+.purpose-grid {
+  display: grid;
+  gap: 14px;
+}
+
+@media (min-width: 760px) {
+  .purpose-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.purpose-card {
+  padding: 22px 20px;
+}
+
+.purpose-card h3 {
+  font-size: 1.5rem;
+  color: var(--gold);
+}
+
+.purpose-card p {
+  color: var(--ink-soft);
+}
+
+.purpose-yours {
+  padding: 26px 20px;
+  border-color: rgba(242, 207, 134, 0.35);
+}
+
+@media (min-width: 640px) {
+  .purpose-yours {
+    padding: 32px 36px;
+  }
+}
+
+.purpose-keys {
+  display: grid;
+  gap: 14px;
+  margin-bottom: 12px;
+}
+
+@media (min-width: 900px) {
+  .purpose-keys {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.purpose-keys > div {
+  padding: 16px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.035);
+  border: 1px solid var(--glass-brd);
+}
+
+.purpose-keys p {
+  margin: 0;
+  color: var(--ink-soft);
+}
+
+.purpose-keys b {
+  color: var(--ink);
+}

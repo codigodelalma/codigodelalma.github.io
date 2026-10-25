@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import type { Profile, Reduction } from '../lib/numerology.ts'
-import { MASTER_NOTES, NUMBERS, POSITIONS, type PositionKey } from '../data/numerology.ts'
+import { MASTER_DESTINY_SOURCE, MASTER_NOTES, NUMBERS, POSITIONS, VOCATIONS, type PositionKey } from '../data/numerology.ts'
 import { MASTER_TRADITION, SEFIROT, TRADITION } from '../data/tradition.ts'
 import { Breakdown } from './Breakdown.tsx'
 import { SourceList } from './SourceList.tsx'
@@ -29,13 +29,17 @@ export function NumberSection({ profile, position, result, index }: Props) {
   const trad = TRADITION[n]
   const sefira = SEFIROT[n - 1]
   const master = result.master
+  // El destino conserva el número maestro 11 (Hans Decoz); los demás números se leen reducidos
+  const shown = position === 'destino' ? profile.destiny.display : n
+  const masterDestiny = shown !== n
+  const vocation = position === 'destino' ? VOCATIONS[shown] : undefined
   const id = `sec-${position}`
 
   return (
     <section className="number-section glass reveal" id={id} aria-labelledby={`${id}-title`}>
       <header className="ns-header">
         <div className="ns-orb" data-n={n}>
-          <span>{n}</span>
+          <span>{shown}</span>
         </div>
         <div className="ns-head-text">
           <p className="eyebrow">
@@ -92,7 +96,23 @@ export function NumberSection({ profile, position, result, index }: Props) {
               <h4>Lección de vida</h4>
               <p>{meaning.lesson}</p>
             </div>
-            {master && (
+            {vocation && (
+              <div className="duo-card">
+                <h4>Campos afines a tu destino {shown}</h4>
+                <p>{vocation.fields}</p>
+                <SourceList sources={[{ label: `Hans Decoz — Expression number ${shown}`, url: vocation.url }]} />
+              </div>
+            )}
+            {master && masterDestiny && (
+              <div className="master-box">
+                <h4>{MASTER_NOTES[master].title}</h4>
+                <p>
+                  Tu destino suma <strong>11</strong>, un número maestro, y por eso no se reduce. {MASTER_NOTES[master].text}
+                </p>
+                <SourceList sources={[MASTER_DESTINY_SOURCE]} />
+              </div>
+            )}
+            {master && !masterDestiny && (
               <div className="master-box">
                 <h4>{MASTER_NOTES[master].title}</h4>
                 <p>

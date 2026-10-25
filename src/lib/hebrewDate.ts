@@ -115,3 +115,15 @@ export function nextHebrewBirthday(born: HebrewDate, from = new Date()): HebrewB
   }
   return null
 }
+
+/** Años cumplidos según el calendario hebreo (cuenta desde el último cumpleaños hebreo). */
+export function hebrewAge(born: HebrewDate, today = new Date()): number | null {
+  const next = nextHebrewBirthday(born, today)
+  if (!next) return null
+  const turning = next.hebrew.year - born.year
+  const isToday =
+    next.date.getUTCFullYear() === today.getFullYear() &&
+    next.date.getUTCMonth() === today.getMonth() &&
+    next.date.getUTCDate() === today.getDate()
+  return isToday ? turning : turning - 1
+}

@@ -231,9 +231,10 @@ export const STONE_NOTE: { text: string; sources: Source[] } = {
 }
 
 export const MONTH_KABBALAH_NOTE: { text: string; sources: Source[] } = {
-  text: 'Ninguna fuente clásica afirma que quien nace en un mes tenga ciertos rasgos: la tradición describe la cualidad espiritual de cada mes como una invitación a trabajarla. El Talmud enseña además que las buenas acciones pueden cambiar el destino. Las correspondencias siguen la versión del Séfer Yetsirá del Gra y el Arizal; otras versiones ordenan las facultades de otra manera.',
+  text: 'El Séfer Yetsirá asigna a cada mes una letra, una facultad y una constelación. El Talmud reconoce que el momento del nacimiento imprime tendencias: quien nace bajo Marte será alguien que derrama sangre, y Rav Ashi aclara que puede ser sangrador (el que hacía sangrías), ladrón, matarife o mohel: la misma inclinación se vive para bien o para mal. Por eso la fuerza de tu mes es un don que traes, no un destino cerrado: Rabí Yojanán enseña que «no hay mazal para Israel», y el Talmud cuenta cómo la caridad libró a una persona de la muerte que anunciaban los astrólogos. Las correspondencias siguen la versión del Séfer Yetsirá del Gra y el Arizal; otras versiones ordenan las facultades de otra manera.',
   sources: [
-    sefaria('Talmud, Shabat 156a-b', 'Shabbat.156b.2'),
+    sefaria('Talmud, Shabat 156a:11-12', 'Shabbat.156a.11-12'),
+    sefaria('Talmud, Shabat 156b', 'Shabbat.156b.4-5'),
     sefaria('Séfer Yetsirá (versión corta) 5:1', 'Sefer_Yetzirah.5.1'),
     sefaria('Peri Tsadik, Rosh Jódesh Siván 4', 'Peri_Tzadik,_Rosh_Chodesh_Sivan_4.3'),
   ],

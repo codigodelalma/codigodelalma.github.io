@@ -203,3 +203,52 @@ export const MASTER_NOTES: Record<number, { title: string; text: string }> = {
     text: 'El 33 es el "maestro del servicio": amor compasivo y vocación de enseñar. Se vive como un 6 con una responsabilidad mayor. Es una incorporación posterior al 11 y al 22, y no todos los autores lo aceptan.',
   },
 }
+
+/** Campos profesionales afines al número de destino (expresión), según Hans Decoz. */
+export const VOCATIONS: Record<number, { fields: string; url: string }> = {
+  1: {
+    fields: 'Liderar o dirigir un negocio propio; generales, políticos, empresarios, inventores, líderes religiosos, activistas y artistas de vanguardia.',
+    url: 'https://www.worldnumerology.com/numerology-expression/expression-number-1/',
+  },
+  2: {
+    fields: 'Diplomacia y consejería, con talento para la psicología; también talento musical.',
+    url: 'https://www.worldnumerology.com/numerology-expression/expression-number-2/',
+  },
+  3: {
+    fields: 'Escritura, comedia, teatro y música; las artes y las tareas que piden soluciones creativas.',
+    url: 'https://www.worldnumerology.com/numerology-expression/expression-number-3/',
+  },
+  4: {
+    fields: 'Contaduría, administración, gerencia, función pública y derecho; artes y música con orden, como la música clásica y la ópera.',
+    url: 'https://www.worldnumerology.com/numerology-expression/expression-number-4/',
+  },
+  5: {
+    fields: 'Ventas, política, derecho, relaciones públicas y ministerio religioso.',
+    url: 'https://www.worldnumerology.com/numerology-expression/expression-number-5/',
+  },
+  6: {
+    fields: 'Docencia (sobre todo con niños o educación especial), sanación, consejería, trabajo social, psicología, arte, diseño, jardinería y agricultura; negocios de trato con la gente.',
+    url: 'https://www.worldnumerology.com/numerology-expression/expression-number-6/',
+  },
+  7: {
+    fields: 'Investigación, análisis, invención, técnica, estudios académicos, derecho, banca, filosofía, teología y dirección en campos científicos o técnicos.',
+    url: 'https://www.worldnumerology.com/numerology-expression/expression-number-7/',
+  },
+  8: {
+    fields: 'Empresa, dirección ejecutiva, banca, negociación, construcción, ingeniería, mando militar o policial, pilotaje y dirección de instituciones.',
+    url: 'https://www.worldnumerology.com/numerology-expression/expression-number-8/',
+  },
+  9: {
+    fields: 'Política, derecho, protección del medio ambiente, enseñanza y sanación; artes como la literatura, la pintura y las artes escénicas.',
+    url: 'https://www.worldnumerology.com/numerology-expression/expression-number-9/',
+  },
+  11: {
+    fields: 'No señala profesiones concretas: lo describe como un docente natural en cualquier área.',
+    url: 'https://www.worldnumerology.com/numerology-expression/expression-number-11/',
+  },
+}
+
+export const MASTER_DESTINY_SOURCE = {
+  label: 'Hans Decoz — Expression number («si encuentras un número maestro, 11, 22 o 33, no lo reduzcas»)',
+  url: 'https://www.worldnumerology.com/numerology-expression-number.htm',
+}
