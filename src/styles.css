@@ -381,13 +381,14 @@ select:focus {
 }
 
 /* ---------- Reveal ---------- */
-.reveal {
+/* Solo con JavaScript activo: sin JS (o para buscadores) todo el contenido queda visible */
+.js .reveal {
   opacity: 0;
   transform: translateY(28px);
   transition: opacity 0.8s ease, transform 0.8s cubic-bezier(0.2, 0.7, 0.2, 1);
 }
 
-.reveal.visible {
+.js .reveal.visible {
   opacity: 1;
   transform: none;
 }
@@ -1234,7 +1235,7 @@ select:focus {
     animation: none !important;
     transition: none !important;
   }
-  .reveal {
+  .js .reveal {
     opacity: 1;
     transform: none;
   }

@@ -42,9 +42,11 @@ const csp = html.match(/http-equiv="Content-Security-Policy" content="([^"]+)"/)
 for (const rule of ["default-src 'none'", "connect-src 'none'", "form-action 'none'"]) {
   if (!csp.includes(rule)) problems.push(`dist/index.html: la CSP no incluye ${rule}`)
 }
-// Solo se permite el propio dominio (enlace canónico)
-for (const m of html.matchAll(/(?:src|href)="(?:https?:)?\/\/(?!codigodelalma\.github\.io\/)[^"]+"/g)) {
-  problems.push(`dist/index.html: recurso externo ${m[0]}`)
+// Recursos que el navegador carga solo (scripts, estilos, imágenes, marcos…): únicamente del propio sitio.
+// Los enlaces <a href> a las fuentes citadas no cargan nada hasta que la persona los pulsa.
+const RESOURCE = /<(script|link|img|iframe|source|video|audio|embed|object|track)\b[^>]*?\b(?:src|href|srcset)="((?:https?:)?\/\/[^"]+)"/g
+for (const m of html.matchAll(RESOURCE)) {
+  if (!m[2].startsWith('https://codigodelalma.github.io/')) problems.push(`dist/index.html: recurso externo <${m[1]}> ${m[2]}`)
 }
 
 if (problems.length) {
