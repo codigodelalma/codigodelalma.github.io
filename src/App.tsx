@@ -6,6 +6,7 @@ import { BirthForm } from './components/BirthForm.tsx'
 import { Results } from './components/Results.tsx'
 import { Method } from './components/Method.tsx'
 import { Privacy } from './components/Privacy.tsx'
+import { Celestial } from './components/Celestial.tsx'
 
 /** Activa la animación de entrada de los elementos .reveal al hacer scroll. */
 function useReveal(dep: unknown) {
@@ -51,6 +52,7 @@ export default function App() {
     <>
       <Starfield />
       <div className="aurora" aria-hidden="true" />
+      <Celestial />
 
       <header className="topbar">
         <a href="#" className="brand" onClick={reset}>
