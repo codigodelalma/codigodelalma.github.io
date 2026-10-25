@@ -37,16 +37,20 @@ for (const file of targets) {
   for (const [re, what] of FORBIDDEN) if (re.test(text)) problems.push(`${file}: ${what}`)
 }
 
-const html = readFileSync('dist/index.html', 'utf8')
-const csp = html.match(/http-equiv="Content-Security-Policy" content="([^"]+)"/)?.[1].replaceAll('&#39;', "'") ?? ''
-for (const rule of ["default-src 'none'", "connect-src 'none'", "form-action 'none'"]) {
-  if (!csp.includes(rule)) problems.push(`dist/index.html: la CSP no incluye ${rule}`)
-}
-// Recursos que el navegador carga solo (scripts, estilos, imágenes, marcos…): únicamente del propio sitio.
-// Los enlaces <a href> a las fuentes citadas no cargan nada hasta que la persona los pulsa.
-const RESOURCE = /<(script|link|img|iframe|source|video|audio|embed|object|track)\b[^>]*?\b(?:src|href|srcset)="((?:https?:)?\/\/[^"]+)"/g
-for (const m of html.matchAll(RESOURCE)) {
-  if (!m[2].startsWith('https://codigodelalma.github.io/')) problems.push(`dist/index.html: recurso externo <${m[1]}> ${m[2]}`)
+for (const page of ['dist/index.html', 'dist/en/index.html']) {
+  const html = readFileSync(page, 'utf8')
+  const csp = html.match(/http-equiv="Content-Security-Policy" content="([^"]+)"/)?.[1].replaceAll('&#39;', "'") ?? ''
+  for (const rule of ["default-src 'none'", "connect-src 'none'", "form-action 'none'"]) {
+    if (!csp.includes(rule)) problems.push(`${page}: la CSP no incluye ${rule}`)
+  }
+  // La CSP bloquea los estilos en línea: el HTML pre-renderizado no debe llevar atributos style
+  if (/<[a-z][^>]*\sstyle="/i.test(html)) problems.push(`${page}: hay atributos style en línea (los bloquea la CSP)`)
+  // Recursos que el navegador carga solo (scripts, estilos, imágenes, marcos…): únicamente del propio sitio.
+  // Los enlaces <a href> a las fuentes citadas no cargan nada hasta que la persona los pulsa.
+  const RESOURCE = /<(script|link|img|iframe|source|video|audio|embed|object|track)[^>]*?(?:src|href|srcset)="((?:https?:)?\/\/[^"]+)"/g
+  for (const m of html.matchAll(RESOURCE)) {
+    if (!m[2].startsWith('https://codigodelalma.github.io/')) problems.push(`${page}: recurso externo <${m[1]}> ${m[2]}`)
+  }
 }
 
 if (problems.length) {

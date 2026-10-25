@@ -1,6 +1,20 @@
 import { useState } from 'react'
-import { SEFIROT } from '../data/tradition.ts'
+import { useLang } from '../i18n/lang.tsx'
+import { useContent } from '../i18n/data.ts'
 import { SourceList } from './SourceList.tsx'
+
+const UI = {
+  es: {
+    aria: 'Árbol de la Vida con tus sefirot resaltadas',
+    sefira: 'Sefirá',
+    note: 'Toca cualquier sefirá del árbol para leer su significado. El diagrama sigue la disposición de 22 senderos difundida desde el siglo XVII (Kircher); cabalistas judíos como el Arí usan trazados distintos.',
+  },
+  en: {
+    aria: 'Tree of Life with your sefirot highlighted',
+    sefira: 'Sefirah',
+    note: 'Tap any sefirah on the tree to read its meaning. The diagram follows the 22-path layout spread since the 17th century (Kircher); Jewish Kabbalists such as the Ari use different layouts.',
+  },
+}
 
 // Disposición clásica del Árbol de la Vida (10 sefirot y 22 senderos)
 const POS: [number, number][] = [
@@ -30,11 +44,13 @@ interface Props {
 
 export function TreeOfLife({ marks, initial }: Props) {
   const [selected, setSelected] = useState(initial)
+  const t = UI[useLang().lang]
+  const { SEFIROT } = useContent()
   const s = SEFIROT[selected - 1]
 
   return (
     <div className="tree-wrap">
-      <svg className="tree" viewBox="0 0 400 710" role="img" aria-label="Árbol de la Vida con tus sefirot resaltadas">
+      <svg className="tree" viewBox="0 0 400 710" role="img" aria-label={t.aria}>
         <defs>
           <radialGradient id="glow">
             <stop offset="0" stopColor="#f6d58e" stopOpacity="0.9" />
@@ -82,7 +98,9 @@ export function TreeOfLife({ marks, initial }: Props) {
       </svg>
 
       <div className="tree-info glass">
-        <p className="eyebrow">Sefirá {s.n}</p>
+        <p className="eyebrow">
+          {t.sefira} {s.n}
+        </p>
         <h3>
           {s.name} <span lang="he">{s.hebrew}</span>
         </h3>
@@ -97,8 +115,7 @@ export function TreeOfLife({ marks, initial }: Props) {
         <p>{s.quality}</p>
         <SourceList sources={s.sources} />
         <p className="note">
-          Toca cualquier sefirá del árbol para leer su significado. El diagrama sigue la disposición de 22 senderos
-          difundida desde el siglo XVII (Kircher); cabalistas judíos como el Arí usan trazados distintos.
+          {t.note}
         </p>
       </div>
     </div>

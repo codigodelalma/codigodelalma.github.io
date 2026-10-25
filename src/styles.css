@@ -2186,3 +2186,112 @@ main,
 .purpose-keys b {
   color: var(--ink);
 }
+
+/* ---------- Selector de idioma (como screenshotCM) ---------- */
+.topbar nav {
+  align-items: center;
+}
+
+.lang {
+  display: inline-flex;
+  padding: 3px;
+  gap: 2px;
+  border-radius: 999px;
+  border: 1px solid var(--glass-brd);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.lang button {
+  font: 600 0.78rem var(--sans);
+  letter-spacing: 0.06em;
+  color: var(--ink-soft);
+  background: transparent;
+  border: 0;
+  border-radius: 999px;
+  padding: 5px 10px;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+
+.lang button[aria-pressed='true'] {
+  color: #1b1405;
+  background: linear-gradient(100deg, #f8dfa4, var(--gold));
+}
+
+.lang button:hover:not([aria-pressed='true']) {
+  color: var(--ink);
+}
+
+@media (max-width: 560px) {
+  .topbar nav a[href='#metodo'],
+  .topbar nav a[href='#glosario'] {
+    display: none;
+  }
+}
+
+/* ---------- Glosario ---------- */
+.glossary {
+  padding: 60px 0 0;
+  scroll-margin-top: 70px;
+}
+
+.glossary-grid {
+  display: grid;
+  gap: 12px;
+  margin: 22px 0 0;
+}
+
+@media (min-width: 640px) {
+  .glossary-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1000px) {
+  .glossary-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.glossary-item {
+  padding: 16px 18px;
+  border-radius: 16px;
+}
+
+.glossary-item dt {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 10px;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.glossary-he {
+  font-family: var(--hebrew);
+  font-size: 1.3rem;
+  color: var(--gold);
+}
+
+.glossary-item dd {
+  margin: 0;
+  font-size: 0.92rem;
+  color: var(--ink-soft);
+}
+
+@media print {
+  .glossary,
+  .lang {
+    display: none !important;
+  }
+}
+
+/* Retraso escalonado de las letras del encabezado (en CSS: los estilos en línea los bloquearía la CSP) */
+.hero-glyphs span:nth-child(2) { animation-delay: 0.25s; }
+.hero-glyphs span:nth-child(3) { animation-delay: 0.5s; }
+.hero-glyphs span:nth-child(4) { animation-delay: 0.75s; }
+.hero-glyphs span:nth-child(5) { animation-delay: 1s; }
+.hero-glyphs span:nth-child(6) { animation-delay: 1.25s; }
+.hero-glyphs span:nth-child(7) { animation-delay: 1.5s; }
+.hero-glyphs span:nth-child(8) { animation-delay: 1.75s; }
+.hero-glyphs span:nth-child(9) { animation-delay: 2s; }

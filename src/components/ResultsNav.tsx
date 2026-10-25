@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { useLang } from '../i18n/lang.tsx'
 
 export interface NavItem {
   id: string
@@ -7,6 +8,7 @@ export interface NavItem {
 
 /** Índice fijo de los resultados: muestra en qué parte estás y permite saltar a cualquiera. */
 export function ResultsNav({ items }: { items: NavItem[] }) {
+  const { lang } = useLang()
   const [active, setActive] = useState(items[0]?.id)
 
   useEffect(() => {
@@ -32,7 +34,7 @@ export function ResultsNav({ items }: { items: NavItem[] }) {
   }, [active])
 
   return (
-    <nav className="results-nav" aria-label="Partes de tus resultados">
+    <nav className="results-nav" aria-label={lang === 'en' ? 'Parts of your results' : 'Partes de tus resultados'}>
       <ol>
         {items.map((it, i) => (
           <li key={it.id}>

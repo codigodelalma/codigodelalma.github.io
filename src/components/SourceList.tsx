@@ -1,10 +1,11 @@
 import type { Source } from '../data/tradition.ts'
+import { useLang } from '../i18n/lang.tsx'
 
 export function SourceList({ sources }: { sources: Source[] }) {
   if (!sources.length) return null
   return (
     <p className="sources">
-      <span>Fuente:</span>{' '}
+      <span>{useLang().lang === 'en' ? 'Source:' : 'Fuente:'}</span>{' '}
       {sources.map((s, i) => (
         <span key={i}>
           {i > 0 && ' · '}

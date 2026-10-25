@@ -25,9 +25,9 @@ const securityHeaders = (): Plugin => ({
   ],
 })
 
-// base relativa: funciona en https://usuario.github.io/ y en https://usuario.github.io/repositorio/
+// Rutas absolutas: el sitio vive en la raíz del dominio y la versión en inglés en /en/
 export default defineConfig({
-  base: './',
+  base: '/',
   plugins: [react(), securityHeaders()],
   build: { sourcemap: false, modulePreload: { polyfill: false } },
 })

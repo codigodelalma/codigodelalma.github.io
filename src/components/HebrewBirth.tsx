@@ -1,20 +1,77 @@
 import { useMemo } from 'react'
 import type { BirthDate } from '../lib/numerology.ts'
 import { hebrewAge, hebrewBirthDate, hebrewNumeral, isLeapYear, nextHebrewBirthday } from '../lib/hebrewDate.ts'
-import { BIRTHDAY_CUSTOM, BIRTHDAY_RULES, HEBREW_DAY_SOURCES, HEBREW_MONTHS } from '../data/hebrewMonths.ts'
-import { MONTH_KABBALAH, MONTH_KABBALAH_NOTE, STONE_NOTE } from '../data/monthKabbalah.ts'
-import { MONTH_DEPTH } from '../data/monthDepth.ts'
+import { useLang } from '../i18n/lang.tsx'
+import { useContent } from '../i18n/data.ts'
 import { SourceList } from './SourceList.tsx'
-
-const civil = new Intl.DateTimeFormat('es', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' })
-const civilShort = new Intl.DateTimeFormat('es', { day: 'numeric', month: 'long', timeZone: 'UTC' })
-
-const ordinal = (n: number) => `${n}.º`
 
 /** «El oído» → «del oído» · «La risa» → «de la risa» */
 const ofFaculty = (faculty: string) => {
   const lower = faculty.toLowerCase()
   return lower.startsWith('el ') ? `del ${lower.slice(3)}` : `de ${lower}`
+}
+
+const enOrdinal = (n: number) => `${n}${n === 1 ? 'st' : n === 2 ? 'nd' : n === 3 ? 'rd' : 'th'}`
+
+const UI = {
+  es: {
+    bornOn: 'Naciste el',
+    date: (d: number, m: string, y: number) => `${d} de ${m} de ${y}`,
+    night: 'Nací de noche (después de la puesta del sol)',
+    nightNote:
+      'En el calendario judío el día empieza al anochecer («y fue la tarde y fue la mañana»). Si naciste de noche, tu fecha hebrea es la del día siguiente.',
+    strength: 'La fuerza de tu mes',
+    bornIn: (m: string, faculty: string) => `Naciste en ${m}: el mes ${ofFaculty(faculty)}`,
+    letter: 'Letra',
+    faculty: 'Facultad',
+    tribe: 'Tribu',
+    stone: 'Piedra de la tribu',
+    sign: 'Constelación',
+    stoneOf: (stone: string, tribe: string) => `${stone}, la piedra de ${tribe}:`,
+    identified: (id: string) => `identificada tradicionalmente como ${id}.`,
+    mission: 'Tu misión según el mes',
+    lightOf: (faculty: string) => `La luz ${ofFaculty(faculty)}`,
+    shadow: 'Su sombra',
+    monthOf: (m: string) => `Mes de ${m}`,
+    order: (n: number) => `${n}.º mes contando desde Nisán`,
+    leap: ' · año bisiesto (con dos meses de Adar)',
+    psalmEyebrow: 'El Salmo de tu año',
+    psalm: (n: number) => `Salmo ${n}`,
+    psalmText: (age: number, n: number) =>
+      `Según el calendario hebreo tienes ${age} años: estás en tu año ${n} de vida. Es costumbre recitar cada día, desde el cumpleaños hebreo, el Salmo que corresponde a ese año.`,
+    readPsalm: (n: number) => `Leer el Salmo ${n}`,
+    next: 'Tu próximo cumpleaños hebreo',
+    starts: (d: string) => `Comienza al anochecer del ${d}.`,
+  },
+  en: {
+    bornOn: 'You were born on',
+    date: (d: number, m: string, y: number) => `${d} ${m} ${y}`,
+    night: 'I was born at night (after sunset)',
+    nightNote:
+      'In the Jewish calendar the day begins at nightfall (“and there was evening and there was morning”). If you were born at night, your Hebrew date is that of the following day.',
+    strength: 'The strength of your month',
+    bornIn: (m: string, faculty: string) => `You were born in ${m}: the month of ${faculty.toLowerCase()}`,
+    letter: 'Letter',
+    faculty: 'Faculty',
+    tribe: 'Tribe',
+    stone: 'Stone of the tribe',
+    sign: 'Constellation',
+    stoneOf: (stone: string, tribe: string) => `${stone}, the stone of ${tribe}:`,
+    identified: (id: string) => `traditionally identified as ${id}.`,
+    mission: 'Your mission according to the month',
+    lightOf: (faculty: string) => `The light of ${faculty.toLowerCase()}`,
+    shadow: 'Its shadow',
+    monthOf: (m: string) => `The month of ${m}`,
+    order: (n: number) => `${enOrdinal(n)} month counting from Nisan`,
+    leap: ' · leap year (with two months of Adar)',
+    psalmEyebrow: 'The Psalm of your year',
+    psalm: (n: number) => `Psalm ${n}`,
+    psalmText: (age: number, n: number) =>
+      `According to the Hebrew calendar you are ${age}: you are in year ${n} of your life. It is customary to recite every day, from the Hebrew birthday on, the Psalm that corresponds to that year.`,
+    readPsalm: (n: number) => `Read Psalm ${n}`,
+    next: 'Your next Hebrew birthday',
+    starts: (d: string) => `It begins at nightfall on ${d}.`,
+  },
 }
 
 interface Props {
@@ -24,6 +81,12 @@ interface Props {
 }
 
 export function HebrewBirth({ date, afterSunset, onAfterSunset }: Props) {
+  const { lang } = useLang()
+  const t = UI[lang]
+  const { BIRTHDAY_CUSTOM, BIRTHDAY_RULES, HEBREW_DAY_SOURCES, HEBREW_MONTHS, MONTH_KABBALAH, MONTH_KABBALAH_NOTE, STONE_NOTE, MONTH_DEPTH } =
+    useContent()
+  const civil = new Intl.DateTimeFormat(lang, { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' })
+  const civilShort = new Intl.DateTimeFormat(lang, { day: 'numeric', month: 'long', timeZone: 'UTC' })
   const h = useMemo(() => hebrewBirthDate(date, afterSunset), [date, afterSunset])
   const next = useMemo(() => nextHebrewBirthday(h), [h])
   const age = useMemo(() => hebrewAge(h), [h])
@@ -39,31 +102,26 @@ export function HebrewBirth({ date, afterSunset, onAfterSunset }: Props) {
   return (
     <div className="hebrew-birth">
       <div className="hb-hero glass reveal">
-        <p className="eyebrow">Naciste el</p>
-        <p className="hb-date">
-          {h.day} de {m.name} de {h.year}
-        </p>
+        <p className="eyebrow">{t.bornOn}</p>
+        <p className="hb-date">{t.date(h.day, m.name, h.year)}</p>
         <p className="hb-hebrew" lang="he" dir="rtl">
           {hebrewText}
         </p>
         <label className="switch">
           <input type="checkbox" checked={afterSunset} onChange={(e) => onAfterSunset(e.target.checked)} />
           <span className="switch-track" aria-hidden="true" />
-          <span>Nací de noche (después de la puesta del sol)</span>
+          <span>{t.night}</span>
         </label>
-        <p className="note">
-          En el calendario judío el día empieza al anochecer («y fue la tarde y fue la mañana»). Si naciste de noche, tu
-          fecha hebrea es la del día siguiente.
-        </p>
+        <p className="note">{t.nightNote}</p>
         <SourceList sources={HEBREW_DAY_SOURCES} />
       </div>
 
       <div className="hb-mission glass reveal">
-        <p className="eyebrow">La fuerza de tu mes</p>
-        <h3>Naciste en {m.name}: el mes {ofFaculty(k.faculty)}</h3>
+        <p className="eyebrow">{t.strength}</p>
+        <h3>{t.bornIn(m.name, k.faculty)}</h3>
         <dl className="hb-attrs">
           <div>
-            <dt>Letra</dt>
+            <dt>{t.letter}</dt>
             <dd>
               <span className="hb-attr-he" lang="he">
                 {k.letter}
@@ -72,7 +130,7 @@ export function HebrewBirth({ date, afterSunset, onAfterSunset }: Props) {
             </dd>
           </div>
           <div>
-            <dt>Facultad</dt>
+            <dt>{t.faculty}</dt>
             <dd>
               <span className="hb-attr-he" lang="he">
                 {k.facultyHe}
@@ -81,7 +139,7 @@ export function HebrewBirth({ date, afterSunset, onAfterSunset }: Props) {
             </dd>
           </div>
           <div>
-            <dt>Tribu</dt>
+            <dt>{t.tribe}</dt>
             <dd>
               <span className="hb-attr-he" lang="he">
                 {k.tribeHe}
@@ -90,7 +148,7 @@ export function HebrewBirth({ date, afterSunset, onAfterSunset }: Props) {
             </dd>
           </div>
           <div>
-            <dt>Piedra de la tribu</dt>
+            <dt>{t.stone}</dt>
             <dd>
               <span className="hb-attr-he" lang="he">
                 {k.stoneHe}
@@ -99,30 +157,27 @@ export function HebrewBirth({ date, afterSunset, onAfterSunset }: Props) {
             </dd>
           </div>
           <div>
-            <dt>Constelación</dt>
+            <dt>{t.sign}</dt>
             <dd>{k.sign}</dd>
           </div>
         </dl>
         <p className="hb-stone">
-          <b>
-            {k.stone}, la piedra de {k.tribe}:
-          </b>{' '}
-          identificada tradicionalmente como {k.stoneId}.
+          <b>{t.stoneOf(k.stone, k.tribe)}</b> {t.identified(k.stoneId)}
         </p>
         <div className="lesson-box">
-          <h4>Tu misión según el mes</h4>
+          <h4>{t.mission}</h4>
           <p>{k.invitation}</p>
         </div>
         <SourceList sources={k.sources} />
         <div className="duo">
           <div className="duo-card light">
-            <h4>La luz {ofFaculty(k.faculty)}</h4>
+            <h4>{t.lightOf(k.faculty)}</h4>
             <p>{depth.light.text}</p>
             <SourceList sources={depth.light.sources} />
           </div>
           {depth.shadow && (
             <div className="duo-card shadow">
-              <h4>Su sombra</h4>
+              <h4>{t.shadow}</h4>
               <p>{depth.shadow.text}</p>
               <SourceList sources={depth.shadow.sources} />
             </div>
@@ -141,10 +196,10 @@ export function HebrewBirth({ date, afterSunset, onAfterSunset }: Props) {
               {m.hebrew}
             </span>
             <div>
-              <h3>Mes de {m.name}</h3>
+              <h3>{t.monthOf(m.name)}</h3>
               <p className="note">
-                {ordinal(m.order)} mes contando desde Nisán
-                {h.month.startsWith('adar') && isLeapYear(h.year) ? ' · año bisiesto (con dos meses de Adar)' : ''}
+                {t.order(m.order)}
+                {h.month.startsWith('adar') && isLeapYear(h.year) ? t.leap : ''}
               </p>
             </div>
           </div>
@@ -160,15 +215,12 @@ export function HebrewBirth({ date, afterSunset, onAfterSunset }: Props) {
 
         {psalm && age !== null && (
           <div className="hb-psalm glass reveal">
-            <p className="eyebrow">El Salmo de tu año</p>
-            <p className="hb-next-date">Salmo {psalm}</p>
+            <p className="eyebrow">{t.psalmEyebrow}</p>
+            <p className="hb-next-date">{t.psalm(psalm)}</p>
+            <p>{t.psalmText(age, psalm)}</p>
             <p>
-              Según el calendario hebreo tienes {age} años: estás en tu año {psalm} de vida. Es costumbre recitar cada día,
-              desde el cumpleaños hebreo, el Salmo que corresponde a ese año.
-            </p>
-            <p>
-              <a className="btn btn-ghost btn-sm" href={`https://www.sefaria.org/Psalms.${psalm}?lang=bi`} target="_blank" rel="noopener noreferrer">
-                Leer el Salmo {psalm}
+              <a className="btn btn-ghost btn-sm" href={`https://www.sefaria.org/Psalms.${psalm}?lang=${lang === 'en' ? 'en' : 'bi'}`} target="_blank" rel="noopener noreferrer">
+                {t.readPsalm(psalm)}
               </a>
             </p>
             <SourceList
@@ -182,12 +234,10 @@ export function HebrewBirth({ date, afterSunset, onAfterSunset }: Props) {
 
         {next && nextMonth && eve && (
           <div className="hb-next glass reveal">
-            <p className="eyebrow">Tu próximo cumpleaños hebreo</p>
-            <p className="hb-next-date">
-              {next.hebrew.day} de {nextMonth.name} de {next.hebrew.year}
-            </p>
+            <p className="eyebrow">{t.next}</p>
+            <p className="hb-next-date">{t.date(next.hebrew.day, nextMonth.name, next.hebrew.year)}</p>
             <p className="hb-next-civil">{civil.format(next.date)}</p>
-            <p className="note">Comienza al anochecer del {civilShort.format(eve)}.</p>
+            <p className="note">{t.starts(civilShort.format(eve))}</p>
             {!next.shortMonth && next.hebrew.month !== h.month && (
               <p className="note">{BIRTHDAY_RULES.adar.text}</p>
             )}

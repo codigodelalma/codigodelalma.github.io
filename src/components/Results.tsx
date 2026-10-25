@@ -1,7 +1,6 @@
 import { useMemo, useState, type ReactNode } from 'react'
 import type { Profile } from '../lib/numerology.ts'
-import { NUMBERS, POSITIONS, type PositionKey } from '../data/numerology.ts'
-import { SEFIROT } from '../data/tradition.ts'
+import type { PositionKey } from '../data/numerology.ts'
 import { NumberSection } from './NumberSection.tsx'
 import { TreeOfLife } from './TreeOfLife.tsx'
 import { HebrewBirth } from './HebrewBirth.tsx'
@@ -9,23 +8,147 @@ import { Purpose } from './Purpose.tsx'
 import { hebrewBirthDate } from '../lib/hebrewDate.ts'
 import { ResultsNav, type NavItem } from './ResultsNav.tsx'
 import { NameWords } from './NameWords.tsx'
-
-const MONTHS = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre']
+import { useLang } from '../i18n/lang.tsx'
+import { useContent } from '../i18n/data.ts'
 
 const ORDER: PositionKey[] = ['leccion', 'alma', 'personalidad', 'destino']
+const PART_IDS = ['parte-resumen', 'parte-numeros', 'parte-hebrea', 'parte-arbol', 'parte-nombre', 'parte-mision', 'parte-guardar']
 
-const PARTS: NavItem[] = [
-  { id: 'parte-resumen', label: 'Resumen' },
-  { id: 'parte-numeros', label: 'Tus 4 números' },
-  { id: 'parte-hebrea', label: 'Fecha hebrea' },
-  { id: 'parte-arbol', label: 'Árbol de la Vida' },
-  { id: 'parte-nombre', label: 'Tu nombre' },
-  { id: 'parte-mision', label: 'Para qué viniste' },
-  { id: 'parte-guardar', label: 'Guardar' },
-]
+const UI = {
+  es: {
+    nav: ['Resumen', 'Tus 4 números', 'Fecha hebrea', 'Árbol de la Vida', 'Tu nombre', 'Para qué viniste', 'Guardar'],
+    map: 'Tu mapa numerológico',
+    born: 'Fecha de nacimiento',
+    parts: [
+      ['Tu resumen', 'Tus cuatro números principales de un vistazo y lo que significan juntos.'],
+      [
+        'Tus cuatro números, uno por uno',
+        'Cada número tiene cuatro pestañas: su significado en numerología, en la Kabbalah, en la tradición judía y cómo se calculó.',
+      ],
+      [
+        'Tu fecha de nacimiento en el calendario hebreo',
+        'El día y el mes judíos en que naciste, la fuerza de ese mes, tu Salmo del año y tu próximo cumpleaños hebreo.',
+      ],
+      ['Tus números en el Árbol de la Vida', ''],
+      [
+        'Las letras de tu nombre',
+        'El número propio de cada uno de tus nombres y apellidos, cuántas letras vibran en cada número y qué cualidades te pide desarrollar esta vida.',
+      ],
+      ['Para qué viniste', 'Lo que enseñan las fuentes judías sobre la misión de cada alma, y cómo se reflejan en tus propios números.'],
+      ['Guarda tu resultado', 'Descárgalo como PDF o compártelo. Todo ocurre en tu dispositivo: no guardamos nada.'],
+    ],
+    tree: (names: string) =>
+      `El Árbol de la Vida (Etz Jaím) representa las diez sefirot, los atributos a través de los cuales, según la Kabbalah, lo divino se manifiesta. Se iluminan las que corresponden a tus números: ${names}.`,
+    dayNumber: 'Número del día',
+    talent: 'Talento natural',
+    personalYear: 'Año personal',
+    personalHow: 'día + mes +',
+    universalYear: 'Año universal',
+    universalHow: 'el año para todas las personas',
+    yearsSource: 'Año personal y año universal según Hans Decoz:',
+    and: ' y ',
+    synthesisEyebrow: 'Tu lección de vida en breve',
+    synthesisFor: 'Síntesis para',
+    s1: (n: number, arch: string, essence: string) => (
+      <>
+        Tu <strong>lección de vida {n}</strong> ({arch.toLowerCase()}) te invita a <em>{essence}</em>.{' '}
+      </>
+    ),
+    s2: (a: number, essence: string, p: number, proj: string) => (
+      <>
+        En lo profundo, tu <strong>alma {a}</strong> busca <em>{essence}</em>, mientras que el mundo te percibe a través de tu{' '}
+        <strong>personalidad {p}</strong>, que proyecta {proj}.
+      </>
+    ),
+    s3: (d: number) => (
+      <>
+        La unión de ambos forma tu <strong>destino {d}</strong>:{' '}
+      </>
+    ),
+    s4: (y: number, n: number) => `Tu año personal ${y} vibra en ${n}:`,
+    karmicIntro: (
+      <>
+        Los números ausentes se conocen en numerología como <strong>lecciones kármicas</strong>: cualidades que esta vida te
+        pide desarrollar de forma consciente.
+      </>
+    ),
+    develop: 'desarrollar',
+    noKarmic: 'Tu nombre contiene los nueve números: no tienes lecciones kármicas pendientes.',
+    pdf: 'Guardar como PDF',
+    share: 'Compartir',
+    copied: '¡Copiado!',
+    again: 'Nueva consulta',
+    shareTitle: 'Mi código numerológico',
+  },
+  en: {
+    nav: ['Summary', 'Your 4 numbers', 'Hebrew date', 'Tree of Life', 'Your name', 'Why you came', 'Save'],
+    map: 'Your numerology map',
+    born: 'Date of birth',
+    parts: [
+      ['Your summary', 'Your four main numbers at a glance and what they mean together.'],
+      [
+        'Your four numbers, one by one',
+        'Each number has four tabs: its meaning in numerology, in Kabbalah, in Jewish tradition, and how it was calculated.',
+      ],
+      [
+        'Your birth date in the Hebrew calendar',
+        'The Jewish day and month you were born in, the strength of that month, your Psalm of the year and your next Hebrew birthday.',
+      ],
+      ['Your numbers in the Tree of Life', ''],
+      [
+        'The letters of your name',
+        'The number of each of your names and surnames, how many letters vibrate in each number and which qualities this life asks you to develop.',
+      ],
+      ['Why you came', 'What Jewish sources teach about each soul’s mission, and how it is reflected in your own numbers.'],
+      ['Save your result', 'Download it as a PDF or share it. Everything happens on your device: we store nothing.'],
+    ],
+    tree: (names: string) =>
+      `The Tree of Life (Etz Chaim) depicts the ten sefirot, the attributes through which, according to Kabbalah, the divine is manifested. The ones that match your numbers light up: ${names}.`,
+    dayNumber: 'Birth day number',
+    talent: 'Natural talent',
+    personalYear: 'Personal year',
+    personalHow: 'day + month +',
+    universalYear: 'Universal year',
+    universalHow: 'the year for everyone',
+    yearsSource: 'Personal year and universal year according to Hans Decoz:',
+    and: ' and ',
+    synthesisEyebrow: 'Your life lesson in brief',
+    synthesisFor: 'Summary for',
+    s1: (n: number, arch: string, essence: string) => (
+      <>
+        Your <strong>life lesson {n}</strong> ({arch.toLowerCase()}) invites you to <em>{essence}</em>.{' '}
+      </>
+    ),
+    s2: (a: number, essence: string, p: number, proj: string) => (
+      <>
+        Deep down, your <strong>soul {a}</strong> seeks to <em>{essence}</em>, while the world sees you through your{' '}
+        <strong>personality {p}</strong>, which projects {proj}.
+      </>
+    ),
+    s3: (d: number) => (
+      <>
+        Together they form your <strong>destiny {d}</strong>:{' '}
+      </>
+    ),
+    s4: (y: number, n: number) => `Your personal year ${y} vibrates in ${n}:`,
+    karmicIntro: (
+      <>
+        In numerology, the missing numbers are known as <strong>karmic lessons</strong>: qualities this life asks you to develop
+        consciously.
+      </>
+    ),
+    develop: 'develop',
+    noKarmic: 'Your name contains all nine numbers: you have no pending karmic lessons.',
+    pdf: 'Save as PDF',
+    share: 'Share',
+    copied: 'Copied!',
+    again: 'New reading',
+    shareTitle: 'My numerology code',
+  },
+}
 
 function Part({ index, title, intro, children }: { index: number; title: string; intro: string; children: ReactNode }) {
-  const { id } = PARTS[index]
+  const id = PART_IDS[index]
   return (
     <section className="part" id={id} aria-labelledby={`${id}-title`}>
       <header className="part-header reveal">
@@ -40,7 +163,12 @@ function Part({ index, title, intro, children }: { index: number; title: string;
   )
 }
 
+const lowerFirst = (s: string) => s.charAt(0).toLowerCase() + s.slice(1)
+
 export function Results({ profile, onReset }: { profile: Profile; onReset: () => void }) {
+  const { lang } = useLang()
+  const t = UI[lang]
+  const C = useContent()
   const [copied, setCopied] = useState(false)
   const [afterSunset, setAfterSunset] = useState(false)
   const hebrew = useMemo(() => hebrewBirthDate(profile.date, afterSunset), [profile.date, afterSunset])
@@ -56,26 +184,31 @@ export function Results({ profile, onReset }: { profile: Profile; onReset: () =>
     personalidad: profile.personality,
     destino: profile.destiny,
   }
+  const shown = (k: PositionKey) => (k === 'destino' ? profile.destiny.display : values[k])
 
   const marks: Record<number, string[]> = {}
-  for (const k of ORDER) (marks[values[k]] ??= []).push(POSITIONS[k].title)
+  for (const k of ORDER) (marks[values[k]] ??= []).push(C.POSITIONS[k].title)
 
-  const L = NUMBERS[values.leccion]
-  const A = NUMBERS[values.alma]
-  const P = NUMBERS[values.personalidad]
-  const D = NUMBERS[values.destino]
-  const Y = NUMBERS[profile.personalYear.value]
+  const L = C.NUMBERS[values.leccion]
+  const A = C.NUMBERS[values.alma]
+  const P = C.NUMBERS[values.personalidad]
+  const D = C.NUMBERS[values.destino]
+  const Y = C.NUMBERS[profile.personalYear.value]
   const firstName = profile.words[0]?.word ?? ''
   const { day, month, year } = profile.date
+  const birth = new Intl.DateTimeFormat(lang, { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' }).format(
+    new Date(Date.UTC(year, month - 1, day, 12)),
+  )
+  const parts = PART_IDS.map((id, i): NavItem => ({ id, label: t.nav[i] }))
 
   const summary =
-    `${profile.name} · ${day} de ${MONTHS[month - 1]} de ${year}\n` +
-    ORDER.map((k) => `${POSITIONS[k].title}: ${values[k]} (${NUMBERS[values[k]].archetype})`).join('\n')
+    `${profile.name} · ${birth}\n` +
+    ORDER.map((k) => `${C.POSITIONS[k].title}: ${shown(k)} (${C.NUMBERS[values[k]].archetype})`).join('\n')
 
   const share = async () => {
-    const text = `Mi código numerológico\n${summary}\n${location.href}`
+    const text = `${t.shareTitle}\n${summary}\n${location.href}`
     try {
-      if (navigator.share) await navigator.share({ title: 'Mi código numerológico', text })
+      if (navigator.share) await navigator.share({ title: t.shareTitle, text })
       else {
         await navigator.clipboard.writeText(text)
         setCopied(true)
@@ -89,24 +222,24 @@ export function Results({ profile, onReset }: { profile: Profile; onReset: () =>
   return (
     <div className="results" id="resultados">
       <div className="summary reveal">
-        <p className="eyebrow">Tu mapa numerológico</p>
+        <p className="eyebrow">{t.map}</p>
         <h2 className="summary-name">{profile.name}</h2>
         <p className="summary-date">
-          Fecha de nacimiento: {day} de {MONTHS[month - 1]} de {year}
+          {t.born}: {birth}
         </p>
       </div>
 
-      <ResultsNav items={PARTS} />
+      <ResultsNav items={parts} />
 
-      <Part index={0} title="Tu resumen" intro="Tus cuatro números principales de un vistazo y lo que significan juntos.">
+      <Part index={0} title={t.parts[0][0]} intro={t.parts[0][1]}>
         <div className="orbs">
           {ORDER.map((k, i) => (
             <a key={k} href={`#sec-${k}`} className="orb-card" style={{ animationDelay: `${i * 120}ms` }}>
               <span className="orb" data-n={values[k]}>
-                {k === 'destino' ? profile.destiny.display : values[k]}
+                {shown(k)}
               </span>
-              <span className="orb-title">{POSITIONS[k].title}</span>
-              <span className="orb-sub">{NUMBERS[values[k]].archetype}</span>
+              <span className="orb-title">{C.POSITIONS[k].title}</span>
+              <span className="orb-sub">{C.NUMBERS[values[k]].archetype}</span>
             </a>
           ))}
         </div>
@@ -114,31 +247,37 @@ export function Results({ profile, onReset }: { profile: Profile; onReset: () =>
           <div className="mini glass">
             <span className="mini-n">{profile.birthDay.value}</span>
             <span>
-              <b>Número del día</b>
-              <small>Talento natural: {NUMBERS[profile.birthDay.value].keywords.slice(0, 2).join(' y ').toLowerCase()}</small>
+              <b>{t.dayNumber}</b>
+              <small>
+                {t.talent}: {C.NUMBERS[profile.birthDay.value].keywords.slice(0, 2).join(t.and).toLowerCase()}
+              </small>
             </span>
           </div>
           <div className="mini glass">
             <span className="mini-n">{profile.personalYear.value}</span>
             <span>
-              <b>Año personal {profile.personalYear.year}</b>
+              <b>
+                {t.personalYear} {profile.personalYear.year}
+              </b>
               <small>
-                {Y.archetype} · día + mes + {profile.personalYear.year}
+                {Y.archetype} · {t.personalHow} {profile.personalYear.year}
               </small>
             </span>
           </div>
           <div className="mini glass">
             <span className="mini-n">{profile.universalYear.value}</span>
             <span>
-              <b>Año universal {profile.universalYear.year}</b>
+              <b>
+                {t.universalYear} {profile.universalYear.year}
+              </b>
               <small>
-                {NUMBERS[profile.universalYear.value].archetype} · el año para todas las personas
+                {C.NUMBERS[profile.universalYear.value].archetype} · {t.universalHow}
               </small>
             </span>
           </div>
         </div>
         <p className="note mini-source">
-          Año personal y año universal según Hans Decoz:{' '}
+          {t.yearsSource}{' '}
           <a href="https://www.worldnumerology.com/numerology-personal-year/" target="_blank" rel="noopener noreferrer">
             Personal Year
           </a>{' '}
@@ -153,67 +292,50 @@ export function Results({ profile, onReset }: { profile: Profile; onReset: () =>
         </p>
 
         <div className="synthesis glass reveal">
-          <p className="eyebrow">Tu lección de vida en breve</p>
-          <h3>Síntesis para {firstName}</h3>
+          <p className="eyebrow">{t.synthesisEyebrow}</p>
+          <h3>
+            {t.synthesisFor} {firstName}
+          </h3>
           <p>
-            Tu <strong>lección de vida {values.leccion}</strong> ({L.archetype.toLowerCase()}) te invita a{' '}
-            <em>{L.essence}</em>. {L.lesson}
+            {t.s1(values.leccion, L.archetype, L.essence)}
+            {L.lesson}
           </p>
+          <p>{t.s2(values.alma, A.essence, values.personalidad, P.keywords.slice(0, 2).join(t.and).toLowerCase())}</p>
           <p>
-            En lo profundo, tu <strong>alma {values.alma}</strong> busca <em>{A.essence}</em>, mientras que el mundo te
-            percibe a través de tu <strong>personalidad {values.personalidad}</strong>, que proyecta{' '}
-            {P.keywords.slice(0, 2).join(' y ').toLowerCase()}.
-          </p>
-          <p>
-            La unión de ambos forma tu <strong>destino {values.destino}</strong>:{' '}
-            {D.positions.destino.charAt(0).toLowerCase() + D.positions.destino.slice(1)}
+            {t.s3(profile.destiny.display)}
+            {lowerFirst(D.positions.destino)}
           </p>
           <p className="synthesis-year">
-            <strong>
-              Tu año personal {profile.personalYear.year} vibra en {profile.personalYear.value}:
-            </strong>{' '}
-            {Y.year}
+            <strong>{t.s4(profile.personalYear.year, profile.personalYear.value)}</strong> {Y.year}
           </p>
         </div>
       </Part>
 
-      <Part
-        index={1}
-        title="Tus cuatro números, uno por uno"
-        intro="Cada número tiene cuatro pestañas: su significado en numerología, en la Kabbalah, en la tradición judía y cómo se calculó."
-      >
+      <Part index={1} title={t.parts[1][0]} intro={t.parts[1][1]}>
         {ORDER.map((k, i) => (
           <NumberSection key={k} profile={profile} position={k} result={results[k]} index={i + 1} />
         ))}
       </Part>
 
-      <Part
-        index={2}
-        title="Tu fecha de nacimiento en el calendario hebreo"
-        intro="El día y el mes judíos en que naciste, qué se celebra en ese mes y cuándo es tu próximo cumpleaños hebreo."
-      >
+      <Part index={2} title={t.parts[2][0]} intro={t.parts[2][1]}>
         <HebrewBirth date={profile.date} afterSunset={afterSunset} onAfterSunset={setAfterSunset} />
       </Part>
 
       <Part
         index={3}
-        title="Tus números en el Árbol de la Vida"
-        intro={`El Árbol de la Vida (Etz Jaím) representa las diez sefirot, los atributos a través de los cuales, según la Kabbalah, lo divino se manifiesta. Se iluminan las que corresponden a tus números: ${Object.keys(
-          marks,
-        )
-          .map((n) => SEFIROT[Number(n) - 1].name)
-          .join(', ')}.`}
+        title={t.parts[3][0]}
+        intro={t.tree(
+          Object.keys(marks)
+            .map((n) => C.SEFIROT[Number(n) - 1].name)
+            .join(', '),
+        )}
       >
         <div className="reveal">
           <TreeOfLife marks={marks} initial={values.leccion} />
         </div>
       </Part>
 
-      <Part
-        index={4}
-        title="Las letras de tu nombre"
-        intro="El número propio de cada uno de tus nombres y apellidos, cuántas letras vibran en cada número y qué cualidades te pide desarrollar esta vida."
-      >
+      <Part index={4} title={t.parts[4][0]} intro={t.parts[4][1]}>
         <NameWords words={profile.words} />
         <div className="karmic glass reveal">
           <div className="incl-grid">
@@ -224,49 +346,38 @@ export function Results({ profile, onReset }: { profile: Profile; onReset: () =>
               </div>
             ))}
           </div>
-          <p className="section-intro">
-            Los números ausentes se conocen en numerología como <strong>lecciones kármicas</strong>: cualidades que esta
-            vida te pide desarrollar de forma consciente.
-          </p>
+          <p className="section-intro">{t.karmicIntro}</p>
           {profile.karmicLessons.length ? (
             <ul className="karmic-list">
               {profile.karmicLessons.map((n) => (
                 <li key={n}>
                   <b>
-                    {n} · {NUMBERS[n].archetype}:
+                    {n} · {C.NUMBERS[n].archetype}:
                   </b>{' '}
-                  desarrollar {NUMBERS[n].keywords.slice(0, 3).join(', ').toLowerCase()}.
+                  {t.develop} {C.NUMBERS[n].keywords.slice(0, 3).join(', ').toLowerCase()}.
                 </li>
               ))}
             </ul>
           ) : (
-            <p className="lead">Tu nombre contiene los nueve números: no tienes lecciones kármicas pendientes.</p>
+            <p className="lead">{t.noKarmic}</p>
           )}
         </div>
       </Part>
 
-      <Part
-        index={5}
-        title="Para qué viniste"
-        intro="Lo que enseñan las fuentes judías sobre la misión de cada alma, y cómo se reflejan en tus propios números."
-      >
+      <Part index={5} title={t.parts[5][0]} intro={t.parts[5][1]}>
         <Purpose profile={profile} hebrew={hebrew} />
       </Part>
 
-      <Part
-        index={6}
-        title="Guarda tu resultado"
-        intro="Descárgalo como PDF o compártelo. Todo ocurre en tu dispositivo: no guardamos nada."
-      >
+      <Part index={6} title={t.parts[6][0]} intro={t.parts[6][1]}>
         <div className="actions">
           <button className="btn btn-primary" onClick={() => window.print()}>
-            Guardar como PDF
+            {t.pdf}
           </button>
           <button className="btn btn-ghost" onClick={share}>
-            {copied ? '¡Copiado!' : 'Compartir'}
+            {copied ? t.copied : t.share}
           </button>
           <button className="btn btn-ghost" onClick={onReset}>
-            Nueva consulta
+            {t.again}
           </button>
         </div>
       </Part>

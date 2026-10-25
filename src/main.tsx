@@ -1,6 +1,7 @@
 import { StrictMode } from 'react'
 import { createRoot, hydrateRoot } from 'react-dom/client'
 import App from './App.tsx'
+import { langFromPath } from './i18n/lang.tsx'
 import './fonts.ts'
 import './styles.css'
 
@@ -10,7 +11,7 @@ document.documentElement.classList.add('js')
 const root = document.getElementById('root')!
 const app = (
   <StrictMode>
-    <App />
+    <App initialLang={langFromPath(location.pathname)} />
   </StrictMode>
 )
 

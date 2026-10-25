@@ -1,15 +1,40 @@
 import { useEffect, useState } from 'react'
 import { buildProfile, type BirthDate, type Profile } from './lib/numerology.ts'
-import { SITE_NAME, SITE_TAGLINE } from './config.ts'
+import { SITE_NAME } from './config.ts'
 import { Starfield } from './components/Starfield.tsx'
 import { BirthForm } from './components/BirthForm.tsx'
 import { Results } from './components/Results.tsx'
 import { Method } from './components/Method.tsx'
+import { Glossary } from './components/Glossary.tsx'
 import { Privacy } from './components/Privacy.tsx'
 import { Celestial } from './components/Celestial.tsx'
+import { LangSwitch } from './components/LangSwitch.tsx'
+import { LangProvider, langFromPath, pathFor, type Lang } from './i18n/lang.tsx'
+import { META } from './i18n/meta.ts'
+
+const UI = {
+  es: {
+    nav: { method: 'Metodología', glossary: 'Glosario', privacy: 'Privacidad' },
+    h1: 'Tu nombre y tu fecha de nacimiento',
+    h1em: 'guardan un código.',
+    sub: 'Descubre tu lección de vida, el número de tu alma, tu personalidad y tu destino. Cada número se desglosa en tres lecturas: numerología, Kabbalah y tradición judía, con fuentes citadas.',
+    footerPrivacy: 'No recopilamos ni guardamos ningún dato',
+    footerPolicy: 'Política de privacidad',
+    footerNote: 'Contenido con fines de reflexión personal y divulgación cultural.',
+  },
+  en: {
+    nav: { method: 'Method', glossary: 'Glossary', privacy: 'Privacy' },
+    h1: 'Your name and your date of birth',
+    h1em: 'hold a code.',
+    sub: 'Discover your life lesson, your soul number, your personality and your destiny. Each number is broken down into three readings: numerology, Kabbalah and Jewish tradition, with cited sources.',
+    footerPrivacy: 'We do not collect or store any data',
+    footerPolicy: 'Privacy policy',
+    footerNote: 'Content for personal reflection and cultural education.',
+  },
+}
 
 /** Activa la animación de entrada de los elementos .reveal al hacer scroll. */
-function useReveal(dep: unknown) {
+function useReveal(deps: unknown[]) {
   useEffect(() => {
     const els = document.querySelectorAll('.reveal:not(.visible)')
     if (!('IntersectionObserver' in window)) {
@@ -29,18 +54,44 @@ function useReveal(dep: unknown) {
     )
     els.forEach((el) => io.observe(el))
     return () => io.disconnect()
-  }, [dep])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, deps)
 }
 
-export default function App() {
+/** Ajusta el idioma del documento, el título y la descripción al cambiar de idioma. */
+function applyDocumentLang(lang: Lang) {
+  document.documentElement.lang = lang
+  document.title = META[lang].title
+  document.querySelector('meta[name="description"]')?.setAttribute('content', META[lang].description)
+}
+
+export default function App({ initialLang = 'es' }: { initialLang?: Lang }) {
+  const [lang, setLangState] = useState<Lang>(initialLang)
   const [profile, setProfile] = useState<Profile | null>(null)
-  useReveal(profile)
+  const t = UI[lang]
+  useReveal([profile, lang])
+
+  // Cambiar de idioma no recarga la página: se conservan los resultados ya calculados
+  const setLang = (next: Lang) => {
+    if (next === lang) return
+    setLangState(next)
+    history.pushState(null, '', pathFor(next) + location.hash)
+    applyDocumentLang(next)
+  }
+
+  useEffect(() => {
+    const onPop = () => {
+      const next = langFromPath(location.pathname)
+      setLangState(next)
+      applyDocumentLang(next)
+    }
+    window.addEventListener('popstate', onPop)
+    return () => window.removeEventListener('popstate', onPop)
+  }, [])
 
   const handleSubmit = (name: string, date: BirthDate) => {
     setProfile(buildProfile(name, date))
-    requestAnimationFrame(() =>
-      document.getElementById('resultados')?.scrollIntoView({ behavior: 'smooth', block: 'start' }),
-    )
+    requestAnimationFrame(() => document.getElementById('resultados')?.scrollIntoView({ behavior: 'smooth', block: 'start' }))
   }
 
   const reset = () => {
@@ -49,40 +100,45 @@ export default function App() {
   }
 
   return (
-    <>
+    <LangProvider value={{ lang, setLang }}>
       <Starfield />
       <div className="aurora" aria-hidden="true" />
       <Celestial />
 
       <header className="topbar">
-        <a href="#" className="brand" onClick={reset}>
-          <img src="./favicon.svg" alt="" width="28" height="28" />
+        <a
+          href={pathFor(lang)}
+          className="brand"
+          onClick={(e) => {
+            e.preventDefault()
+            reset()
+          }}
+        >
+          <img src="/favicon.svg" alt="" width="28" height="28" />
           <span>{SITE_NAME}</span>
         </a>
         <nav>
-          <a href="#metodo">Metodología</a>
-          <a href="#privacidad">Privacidad</a>
+          <a href="#metodo">{t.nav.method}</a>
+          <a href="#glosario">{t.nav.glossary}</a>
+          <a href="#privacidad">{t.nav.privacy}</a>
+          <LangSwitch />
         </nav>
       </header>
 
       <main>
         <section className="hero">
           <div className="hero-text">
-            <p className="eyebrow">{SITE_TAGLINE}</p>
+            <p className="eyebrow">{META[lang].tagline}</p>
             <h1>
-              Tu nombre y tu fecha de nacimiento
+              {t.h1}
               <br />
-              <em>guardan un código.</em>
+              <em>{t.h1em}</em>
             </h1>
-            <p className="hero-sub">
-              Descubre tu lección de vida, el número de tu alma, tu personalidad y tu destino. Cada número se desglosa
-              en tres lecturas: numerología, Kabbalah y tradición judía, con fuentes citadas.
-            </p>
+            <p className="hero-sub">{t.sub}</p>
             <div className="hero-glyphs" aria-hidden="true" lang="he">
+              {/* Sin estilos en línea: la CSP (style-src 'self') los bloquearía en el HTML pre-renderizado */}
               {'אבגדהוזחט'.split('').map((g, i) => (
-                <span key={i} style={{ animationDelay: `${i * 0.25}s` }}>
-                  {g}
-                </span>
+                <span key={i}>{g}</span>
               ))}
             </div>
           </div>
@@ -92,6 +148,7 @@ export default function App() {
         {profile && <Results profile={profile} onReset={reset} key={profile.name + JSON.stringify(profile.date)} />}
 
         <Method />
+        <Glossary />
         <Privacy />
       </main>
 
@@ -100,10 +157,10 @@ export default function App() {
           {SITE_NAME} · {new Date().getFullYear()}
         </p>
         <p className="note">
-          No recopilamos ni guardamos ningún dato · <a href="#privacidad">Política de privacidad</a>
+          {t.footerPrivacy} · <a href="#privacidad">{t.footerPolicy}</a>
         </p>
-        <p className="note">Contenido con fines de reflexión personal y divulgación cultural.</p>
+        <p className="note">{t.footerNote}</p>
       </footer>
-    </>
+    </LangProvider>
   )
 }
