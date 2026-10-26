@@ -1479,9 +1479,41 @@ select:focus {
   background: rgba(27, 20, 5, 0.15);
 }
 
-@media (min-width: 900px) {
+/* Móvil: una fila con scroll. Los márgenes automáticos centran la fila cuando cabe y, cuando no,
+   dejan llegar al primer apartado (justify-content: center lo cortaba por la izquierda). */
+@media (max-width: 767px) {
+  .results-nav li:first-child {
+    margin-left: auto;
+  }
+
+  .results-nav li:last-child {
+    margin-right: auto;
+  }
+
   .results-nav ol {
+    -webkit-mask-image: linear-gradient(90deg, transparent, #000 16px, #000 calc(100% - 16px), transparent);
+    mask-image: linear-gradient(90deg, transparent, #000 16px, #000 calc(100% - 16px), transparent);
+    padding: 0 12px;
+  }
+}
+
+/* Tablet y escritorio: todos los apartados visibles; si no caben en una fila, pasan a la siguiente */
+@media (min-width: 768px) {
+  .results-nav ol {
+    flex-wrap: wrap;
     justify-content: center;
+    gap: 6px 4px;
+    overflow: visible;
+  }
+
+  .results-nav a {
+    gap: 6px;
+    padding: 6px 10px 6px 5px;
+  }
+
+  .results-nav li.rn-new-group {
+    margin-left: 4px;
+    padding-left: 4px;
   }
 }
 
