@@ -232,6 +232,14 @@ export const VOCATIONS: Record<number, { fields: string; url: string }> = {
     fields: 'No specific professions are named: it is described as a natural teacher in any field.',
     url: 'https://www.worldnumerology.com/numerology-expression/expression-number-11/',
   },
+  22: {
+    fields: 'No specific professions are named: it is credited with leadership and a liking for large enterprises and work on an international scale.',
+    url: 'https://www.worldnumerology.com/numerology-expression/expression-number-22/',
+  },
+  33: {
+    fields: 'Business that involves dealing with people; a humanitarian motivation, especially in education, medicine, politics or law.',
+    url: 'https://www.worldnumerology.com/numerology-expression/expression-number-33/',
+  },
 }
 
 export const MASTER_DESTINY_SOURCE = {

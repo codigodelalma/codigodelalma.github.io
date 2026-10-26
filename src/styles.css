@@ -2533,3 +2533,17 @@ main,
   min-width: 0;
   max-width: 100vw;
 }
+
+/* Número maestro junto a su forma reducida: «33/6» */
+.master-num {
+  display: inline-flex;
+  align-items: baseline;
+  white-space: nowrap;
+}
+
+.master-num small {
+  font-size: 0.42em;
+  font-weight: 600;
+  opacity: 0.8;
+  margin-left: 1px;
+}

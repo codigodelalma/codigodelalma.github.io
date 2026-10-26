@@ -1,7 +1,8 @@
 import { Fragment, useMemo, useState, type ReactNode } from 'react'
-import type { Profile } from '../lib/numerology.ts'
+import { masterForm, type Profile } from '../lib/numerology.ts'
 import type { PositionKey } from '../data/numerology.ts'
 import { NumberSection } from './NumberSection.tsx'
+import { MasterNumber } from './MasterNumber.tsx'
 import { TreeOfLife } from './TreeOfLife.tsx'
 import { HebrewBirth } from './HebrewBirth.tsx'
 import { Purpose } from './Purpose.tsx'
@@ -65,18 +66,18 @@ const UI = {
     synthesisEyebrow: 'Tu lección de vida en breve',
     challenge: 'Tu reto:',
     synthesisFor: 'Síntesis para',
-    s1: (n: number, arch: string, essence: string) => (
+    s1: (n: string, arch: string, essence: string) => (
       <>
         Tu <strong>lección de vida {n}</strong> ({arch.toLowerCase()}) te invita a <em>{essence}</em>.{' '}
       </>
     ),
-    s2: (a: number, essence: string, p: number, proj: string) => (
+    s2: (a: string, essence: string, p: string, proj: string) => (
       <>
         En lo profundo, tu <strong>alma {a}</strong> busca <em>{essence}</em>, mientras que el mundo te percibe a través de tu{' '}
         <strong>personalidad {p}</strong>, que proyecta {proj}.
       </>
     ),
-    s3: (d: number) => (
+    s3: (d: string) => (
       <>
         La unión de ambos forma tu <strong>destino {d}</strong>:{' '}
       </>
@@ -135,18 +136,18 @@ const UI = {
     synthesisEyebrow: 'Your life lesson in brief',
     challenge: 'Your challenge:',
     synthesisFor: 'Summary for',
-    s1: (n: number, arch: string, essence: string) => (
+    s1: (n: string, arch: string, essence: string) => (
       <>
         Your <strong>life lesson {n}</strong> ({arch.toLowerCase()}) invites you to <em>{essence}</em>.{' '}
       </>
     ),
-    s2: (a: number, essence: string, p: number, proj: string) => (
+    s2: (a: string, essence: string, p: string, proj: string) => (
       <>
         Deep down, your <strong>soul {a}</strong> seeks to <em>{essence}</em>, while the world sees you through your{' '}
         <strong>personality {p}</strong>, which projects {proj}.
       </>
     ),
-    s3: (d: number) => (
+    s3: (d: string) => (
       <>
         Together they form your <strong>destiny {d}</strong>:{' '}
       </>
@@ -210,7 +211,7 @@ export function Results({ profile, onReset }: { profile: Profile; onReset: () =>
     personalidad: profile.personality,
     destino: profile.destiny,
   }
-  const shown = (k: PositionKey) => (k === 'destino' ? profile.destiny.display : values[k])
+  const shown = (k: PositionKey) => masterForm(results[k])
 
   const marks: Record<number, string[]> = {}
   for (const k of ORDER) (marks[values[k]] ??= []).push(C.POSITIONS[k].title)
@@ -251,7 +252,7 @@ export function Results({ profile, onReset }: { profile: Profile; onReset: () =>
         {ORDER.map((k, i) => (
           <a key={k} href={`#sec-${k}`} className="orb-card" style={{ animationDelay: `${i * 120}ms` }}>
             <span className="orb" data-n={values[k]}>
-              {shown(k)}
+              <MasterNumber result={results[k]} />
             </span>
             <span className="orb-title">{C.POSITIONS[k].title}</span>
             <span className="orb-sub">{C.NUMBERS[values[k]].archetype}</span>
@@ -312,12 +313,12 @@ export function Results({ profile, onReset }: { profile: Profile; onReset: () =>
           {t.synthesisFor} {firstName}
         </h3>
         <p>
-          {t.s1(values.leccion, L.archetype, L.essence)}
+          {t.s1(shown('leccion'), L.archetype, L.essence)}
           {t.challenge} {lowerFirst(L.lesson)}
         </p>
-        <p>{t.s2(values.alma, A.essence, values.personalidad, P.keywords.slice(0, 2).join(t.and).toLowerCase())}</p>
+        <p>{t.s2(shown('alma'), A.essence, shown('personalidad'), P.keywords.slice(0, 2).join(t.and).toLowerCase())}</p>
         <p>
-          {t.s3(profile.destiny.display)}
+          {t.s3(shown('destino'))}
           {lowerFirst(D.positions.destino)}
         </p>
         <p className="synthesis-year">

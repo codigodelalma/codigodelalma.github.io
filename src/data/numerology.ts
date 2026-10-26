@@ -246,6 +246,14 @@ export const VOCATIONS: Record<number, { fields: string; url: string }> = {
     fields: 'No señala profesiones concretas: lo describe como un docente natural en cualquier área.',
     url: 'https://www.worldnumerology.com/numerology-expression/expression-number-11/',
   },
+  22: {
+    fields: 'No señala profesiones concretas: le atribuye dotes de liderazgo y gusto por las grandes empresas y el trabajo a escala internacional.',
+    url: 'https://www.worldnumerology.com/numerology-expression/expression-number-22/',
+  },
+  33: {
+    fields: 'Negocios de trato con la gente; una motivación humanitaria, sobre todo en educación, medicina, política o derecho.',
+    url: 'https://www.worldnumerology.com/numerology-expression/expression-number-33/',
+  },
 }
 
 export const MASTER_DESTINY_SOURCE = {

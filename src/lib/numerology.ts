@@ -3,6 +3,8 @@
 //  · Número del alma: vocales de cada nombre, reducidas por palabra y luego sumadas
 //  · Personalidad externa: consonantes, mismo procedimiento
 //  · Número destino: alma + personalidad, reducido
+//  · En las cuatro posiciones, si la suma pasa por 11, 22 o 33 se conserva también el número maestro
+//    (masterForm: «33/6»). La forma reducida sigue siendo la base de cada lectura.
 
 const ROWS = ['ABCDEFGHI', 'JKLMNOPQR', 'STUVWXYZ']
 
@@ -37,6 +39,14 @@ export function reduce(n: number): Reduction {
     value: chain[chain.length - 1],
     master: chain.find((x) => MASTER_NUMBERS.has(x)),
   }
+}
+
+/**
+ * Las dos formas del número: si la suma pasó por 11, 22 o 33 se conserva el maestro junto a su
+ * forma reducida («33/6», como escribe Hans Decoz); si no, solo la reducida («6»).
+ */
+export function masterForm(r: Reduction): string {
+  return r.master ? `${r.master}/${r.value}` : String(r.value)
 }
 
 export interface LetterInfo {
@@ -119,8 +129,7 @@ export interface Profile {
   lifeLesson: Reduction & { digits: number[] }
   soul: Reduction & { parts: number[] }
   personality: Reduction & { parts: number[] }
-  /** display: el número que se muestra (11 se conserva como número maestro en el destino) */
-  destiny: Reduction & { parts: number[]; display: number }
+  destiny: Reduction & { parts: number[] }
   birthDay: Reduction
   /** Año personal (Hans Decoz): día + mes de nacimiento + año del calendario en curso */
   personalYear: Reduction & { year: number; digits: number[] }
@@ -156,9 +165,7 @@ export function buildProfile(name: string, date: BirthDate, today = new Date()):
   const personality = { ...reduce(persParts.reduce((a, b) => a + b, 0)), parts: persParts }
 
   const destinyParts = [soul.value, personality.value]
-  const destinyRed = reduce(soul.value + personality.value)
-  // Número maestro: si alma + personalidad suman 11, el destino se muestra como 11 (Hans Decoz: no se reduce)
-  const destiny = { ...destinyRed, parts: destinyParts, display: destinyRed.chain[0] === 11 ? 11 : destinyRed.value }
+  const destiny = { ...reduce(soul.value + personality.value), parts: destinyParts }
 
   const currentYear = today.getFullYear()
   const pyDigits = dateDigits({ day: date.day, month: date.month, year: currentYear })

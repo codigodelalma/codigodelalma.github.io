@@ -1,4 +1,4 @@
-import type { Profile } from '../lib/numerology.ts'
+import { masterForm, type Profile } from '../lib/numerology.ts'
 import type { HebrewDate } from '../lib/hebrewDate.ts'
 import { useLang } from '../i18n/lang.tsx'
 import { useContent } from '../i18n/data.ts'
@@ -13,7 +13,7 @@ const ofFaculty = (faculty: string) => {
 const UI = {
   es: {
     yours: 'Tu camino, en tus propias claves',
-    destiny: (n: number) => `Numerología · tu destino ${n}`,
+    destiny: (n: string) => `Numerología · tu destino ${n}`,
     month: (m: string) => `Kabbalah · tu mes de ${m}`,
     strength: (faculty: string) => `La fuerza ${ofFaculty(faculty)}.`,
     tikkun: 'Tradición judía · tu tikún',
@@ -23,7 +23,7 @@ const UI = {
   },
   en: {
     yours: 'Your path, in your own keys',
-    destiny: (n: number) => `Numerology · your destiny ${n}`,
+    destiny: (n: string) => `Numerology · your destiny ${n}`,
     month: (m: string) => `Kabbalah · your month of ${m}`,
     strength: (faculty: string) => `The strength of ${faculty.toLowerCase()}.`,
     tikkun: 'Jewish tradition · your tikkun',
@@ -57,7 +57,7 @@ export function Purpose({ profile, hebrew }: { profile: Profile; hebrew: HebrewD
         <p className="eyebrow">{t.yours}</p>
         <div className="purpose-keys">
           <div>
-            <h4>{t.destiny(d.display)}</h4>
+            <h4>{t.destiny(masterForm(d))}</h4>
             <p>
               <b>{destiny.archetype}.</b> {destiny.positions.destino}
             </p>

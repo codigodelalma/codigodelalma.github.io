@@ -13,6 +13,7 @@ const POSITION_KIND: Record<PositionKey, DecozKind> = {
 }
 import { Breakdown } from './Breakdown.tsx'
 import { SourceList } from './SourceList.tsx'
+import { MasterNumber } from './MasterNumber.tsx'
 
 const TAB_IDS = ['num', 'kab', 'jud', 'calc'] as const
 type TabId = (typeof TAB_IDS)[number]
@@ -25,8 +26,8 @@ const UI = {
     shadow: 'Tu sombra',
     lesson: 'Lección de vida',
     fields: 'Campos afines a tu destino',
-    masterDestiny: 'Tu destino suma 11, un número maestro, y por eso no se reduce.',
-    masterPassed: (m: number, n: number) => `Tu cálculo pasó por el ${m} antes de reducirse a ${n}.`,
+    masterKept: (m: number, n: number) =>
+      `Tu suma pasó por el ${m}, un número maestro. Te damos las dos formas: el ${m}, que Hans Decoz conserva sin reducir, y su forma reducida, el ${n}, que es la base de las lecturas de arriba.`,
     value: 'valor',
     sefira: 'sefirá',
     theLetter: 'La letra',
@@ -43,8 +44,8 @@ const UI = {
     shadow: 'Your shadow',
     lesson: 'Life lesson',
     fields: 'Fields related to your destiny',
-    masterDestiny: 'Your destiny adds up to 11, a master number, so it is not reduced.',
-    masterPassed: (m: number, n: number) => `Your calculation passed through ${m} before reducing to ${n}.`,
+    masterKept: (m: number, n: number) =>
+      `Your sum passed through ${m}, a master number. We give you both forms: ${m}, which Hans Decoz keeps unreduced, and its reduced form, ${n}, which is the basis of the readings above.`,
     value: 'value',
     sefira: 'sefirah',
     theLetter: 'The letter',
@@ -73,18 +74,18 @@ export function NumberSection({ profile, position, result, index }: Props) {
   const pos = POSITIONS[position]
   const trad = TRADITION[n]
   const sefira = SEFIROT[n - 1]
+  // Si la suma pasó por 11, 22 o 33 se dan las dos formas: el maestro (Hans Decoz) y la reducida
   const master = result.master
-  // El destino conserva el número maestro 11 (Hans Decoz); los demás números se leen reducidos
-  const shown = position === 'destino' ? profile.destiny.display : n
-  const masterDestiny = shown !== n
-  const vocation = position === 'destino' ? VOCATIONS[shown] : undefined
+  const vocations = position === 'destino' ? [master, n].filter((v): v is number => !!v && !!VOCATIONS[v]) : []
   const id = `sec-${position}`
 
   return (
     <section className="number-section glass reveal" id={id} aria-labelledby={`${id}-title`}>
       <header className="ns-header">
         <div className="ns-orb" data-n={n}>
-          <span>{shown}</span>
+          <span>
+            <MasterNumber result={result} />
+          </span>
         </div>
         <div className="ns-head-text">
           <p className="eyebrow">
@@ -152,30 +153,30 @@ export function NumberSection({ profile, position, result, index }: Props) {
               <p>{meaning.lesson}</p>
             </div>
             <SourceList sources={[{ label: `Hans Decoz — Life Path ${n}`, url: decozUrl('lifePath', n) }]} />
-            {vocation && (
-              <div className="duo-card">
+            {vocations.map((v) => (
+              <div key={v} className="duo-card">
                 <h4>
-                  {t.fields} {shown}
+                  {t.fields} {v}
                 </h4>
-                <p>{vocation.fields}</p>
-                <SourceList sources={[{ label: `Hans Decoz — Expression number ${shown}`, url: vocation.url }]} />
+                <p>{VOCATIONS[v].fields}</p>
+                <SourceList sources={[{ label: `Hans Decoz — Expression number ${v}`, url: VOCATIONS[v].url }]} />
               </div>
-            )}
-            {master && masterDestiny && (
+            ))}
+            {master && (
               <div className="master-box">
                 <h4>{MASTER_NOTES[master].title}</h4>
                 <p>
-                  {t.masterDestiny} {MASTER_NOTES[master].text}
+                  {t.masterKept(master, n)} {MASTER_NOTES[master].text}
                 </p>
-                <SourceList sources={[MASTER_DESTINY_SOURCE]} />
-              </div>
-            )}
-            {master && !masterDestiny && (
-              <div className="master-box">
-                <h4>{MASTER_NOTES[master].title}</h4>
-                <p>
-                  {t.masterPassed(master, n)} {MASTER_NOTES[master].text}
-                </p>
+                <SourceList
+                  sources={[
+                    {
+                      label: `Hans Decoz — ${DECOZ_TITLE[POSITION_KIND[position]]} ${master}`,
+                      url: decozUrl(POSITION_KIND[position], master),
+                    },
+                    MASTER_DESTINY_SOURCE,
+                  ]}
+                />
               </div>
             )}
           </div>

@@ -24,8 +24,13 @@ const UI: Record<'es' | 'en', { eyebrow: string; title: string; table: string; t
         <b>Personalidad externa:</b> el mismo procedimiento con las consonantes.
       </>,
       <>
-        <b>Destino:</b> alma + personalidad. Si suma 11, se conserva como número maestro, como indica Hans Decoz; si no,
-        se reduce a un dígito.
+        <b>Destino:</b> alma + personalidad, reducido a un dígito.
+      </>,
+      <>
+        <b>Números maestros:</b> en las cuatro posiciones se suma todo hasta un dígito, y esa forma reducida es la base de
+        cada lectura. Si en esa suma aparece 11, 22 o 33, también lo conservamos y mostramos las dos formas (por ejemplo,
+        33/6), porque Hans Decoz no reduce los números maestros. Decoz calcula la lección de vida reduciendo por separado
+        el día, el mes y el año, así que en algunas fechas su método no llega al mismo número maestro.
       </>,
     ],
     y: (
@@ -38,8 +43,7 @@ const UI: Record<'es' | 'en', { eyebrow: string; title: string; table: string; t
           Hans Decoz
         </a>{' '}
         la toma como consonante cuando va unida a otra vocal, y Juno Jordan nunca la incluye en el alma. Solo cambian el
-        alma y la personalidad; el destino es el mismo. Si en el camino aparece 11, 22 o 33, se señala como vibración
-        maestra.
+        alma y la personalidad; el destino es el mismo.
       </>
     ),
     three: 'Tres miradas, bien distinguidas',
@@ -78,8 +82,13 @@ const UI: Record<'es' | 'en', { eyebrow: string; title: string; table: string; t
         <b>Outer personality:</b> the same procedure with the consonants.
       </>,
       <>
-        <b>Destiny:</b> soul + personality. If it adds up to 11, it is kept as a master number, as Hans Decoz indicates;
-        otherwise it is reduced to one digit.
+        <b>Destiny:</b> soul + personality, reduced to one digit.
+      </>,
+      <>
+        <b>Master numbers:</b> in all four positions everything is added down to one digit, and that reduced form is the
+        basis of each reading. If 11, 22 or 33 appears in that sum, we also keep it and show both forms (for example, 33/6),
+        because Hans Decoz does not reduce master numbers. Decoz calculates the life lesson by reducing the day, month and
+        year separately, so for some dates his method does not reach the same master number.
       </>,
     ],
     y: (
@@ -92,8 +101,7 @@ const UI: Record<'es' | 'en', { eyebrow: string; title: string; table: string; t
           Hans Decoz
         </a>{' '}
         treats it as a consonant when it is coupled with another vowel, and Juno Jordan never includes it in the soul. Only
-        the soul and personality change; the destiny stays the same. If 11, 22 or 33 appears along the way, it is marked as
-        a master vibration.
+        the soul and personality change; the destiny stays the same.
       </>
     ),
     three: 'Three perspectives, clearly distinguished',
