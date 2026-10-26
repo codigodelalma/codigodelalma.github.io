@@ -7,12 +7,14 @@ const UI = {
   es: {
     aria: 'Árbol de la Vida con tus sefirot resaltadas',
     sefira: 'Sefirá',
-    note: 'Toca cualquier sefirá del árbol para leer su significado. El diagrama sigue la disposición de 22 senderos difundida desde el siglo XVII (Kircher); cabalistas judíos como el Arí usan trazados distintos.',
+    hint: 'Toca cualquier sefirá del árbol para leer su significado.',
+    note: 'El diagrama sigue la disposición de 22 senderos difundida desde el siglo XVII (Kircher); cabalistas judíos como el Arí usan trazados distintos.',
   },
   en: {
     aria: 'Tree of Life with your sefirot highlighted',
     sefira: 'Sefirah',
-    note: 'Tap any sefirah on the tree to read its meaning. The diagram follows the 22-path layout spread since the 17th century (Kircher); Jewish Kabbalists such as the Ari use different layouts.',
+    hint: 'Tap any sefirah on the tree to read its meaning.',
+    note: 'The diagram follows the 22-path layout spread since the 17th century (Kircher); Jewish Kabbalists such as the Ari use different layouts.',
   },
 }
 
@@ -115,6 +117,7 @@ export function TreeOfLife({ marks, initial }: Props) {
         <p>{s.quality}</p>
         <SourceList sources={s.sources} />
         <p className="note">
+          <span className="tree-hint">{t.hint} </span>
           {t.note}
         </p>
       </div>

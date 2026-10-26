@@ -1246,9 +1246,151 @@ select:focus {
 
 /* ---------- Print / PDF ---------- */
 @media print {
+  /* Paleta para papel blanco: los tonos claros pensados para el fondo oscuro no se leen impresos */
+  :root {
+    --ink: #16132b;
+    --ink-soft: #37324f;
+    --ink-mute: #5c5776;
+    --gold: #85601a;
+    --gold-2: #6b4c12;
+    --violet: #4b33b8;
+    --violet-2: #3b2397;
+    --teal: #1f6f69;
+    --glass: #fff;
+    --glass-brd: #d6d1e6;
+    color-scheme: light;
+  }
+
+  /* Las animaciones y transiciones se congelaban a medio camino al imprimir (cajas vacías, texto desvaído) */
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+    text-shadow: none !important;
+  }
+
   body {
     background: #fff;
     color: #111;
+  }
+
+  /* Orbes: número oscuro con aro de color, legible aunque no se impriman los fondos */
+  .orb,
+  .ns-orb,
+  .name-orb {
+    background: #fff !important;
+    color: var(--c2) !important;
+    box-shadow: none !important;
+    border: 2px solid var(--c2);
+  }
+
+  .orb::after,
+  .ns-orb::after,
+  .name-orb::after {
+    display: none;
+  }
+
+  /* Con overflow: hidden y el brillo decorativo encima, Chrome dejaba la caja vacía al paginar */
+  .glass,
+  .synthesis,
+  .hb-hero {
+    overflow: visible !important;
+  }
+
+  .synthesis::before,
+  .hb-hero::before {
+    display: none;
+  }
+
+  /* Las cuadrículas se apilan en una columna: partidas entre páginas, sus tarjetas se superponían */
+  .results,
+  .part,
+  .panel-grid,
+  .hebrew-birth,
+  .hb-grid,
+  .gematria,
+  .purpose,
+  .purpose-grid,
+  .name-words {
+    display: flex !important;
+    flex-direction: column;
+  }
+
+  /* Colores fijos pensados para el fondo oscuro */
+  .sources a {
+    color: var(--gold);
+  }
+
+  .master-box h4,
+  .name-sum .name-master,
+  .tile-cons,
+  .kab-letter.sefira .glyph {
+    color: var(--violet);
+  }
+
+  /* Árbol de la Vida en papel: discos claros, nombres oscuros y senderos visibles */
+  .tree .path {
+    stroke: #cfc9e0;
+  }
+
+  .tree .path.lit {
+    filter: none;
+  }
+
+  .sefira-node .disc {
+    fill: #fff;
+    stroke: #8f88aa;
+  }
+
+  .sefira-node.lit .disc {
+    fill: #f7efdc;
+  }
+
+  .sefira-node .node-name,
+  .sefira-node.lit .node-name {
+    fill: var(--ink);
+  }
+
+  .sefira-node .halo {
+    display: none;
+  }
+
+  .hb-attrs,
+  .hb-psalm,
+  .hb-next,
+  .tree-info {
+    break-inside: avoid;
+  }
+
+  /* Lo que solo sirve en pantalla */
+  .switch,
+  #parte-guardar,
+  #parte-guematria:has(.gem-empty),
+  .gem-input-card,
+  .tree-hint {
+    display: none !important;
+  }
+
+  /* Cortes de página: que no se partan los bloques pequeños ni quede un título solo al final */
+  .part-header,
+  .part-group,
+  h2,
+  h3,
+  h4 {
+    break-after: avoid;
+  }
+
+  .duo-card,
+  .lesson-box,
+  .master-box,
+  .orb-card,
+  .mini,
+  .name-card,
+  .purpose-card,
+  .facts li,
+  .gem-letter {
+    break-inside: avoid;
   }
   .starfield,
   .aurora,
@@ -1271,7 +1413,6 @@ select:focus {
     opacity: 1 !important;
     transform: none !important;
   }
-  .number-section,
   .synthesis,
   .karmic {
     break-inside: avoid;
