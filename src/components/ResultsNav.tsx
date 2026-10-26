@@ -4,6 +4,8 @@ import { useLang } from '../i18n/lang.tsx'
 export interface NavItem {
   id: string
   label: string
+  /** Bloque al que pertenece la parte (se muestra un separador al cambiar de bloque) */
+  group?: string
 }
 
 /** Índice fijo de los resultados: muestra en qué parte estás y permite saltar a cualquiera. */
@@ -37,7 +39,7 @@ export function ResultsNav({ items }: { items: NavItem[] }) {
     <nav className="results-nav" aria-label={lang === 'en' ? 'Parts of your results' : 'Partes de tus resultados'}>
       <ol>
         {items.map((it, i) => (
-          <li key={it.id}>
+          <li key={it.id} className={i > 0 && it.group !== items[i - 1].group ? 'rn-new-group' : undefined} title={it.group}>
             <a href={`#${it.id}`} className={active === it.id ? 'active' : ''} aria-current={active === it.id ? 'true' : undefined}>
               <span className="rn-num">{i + 1}</span>
               {it.label}

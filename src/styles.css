@@ -2295,3 +2295,241 @@ main,
 .hero-glyphs span:nth-child(7) { animation-delay: 1.5s; }
 .hero-glyphs span:nth-child(8) { animation-delay: 1.75s; }
 .hero-glyphs span:nth-child(9) { animation-delay: 2s; }
+
+/* ---------- Guematría ---------- */
+.gematria {
+  display: grid;
+  gap: 18px;
+}
+
+.gem-input-card {
+  padding: 24px 20px;
+  display: grid;
+  gap: 14px;
+}
+
+@media (min-width: 640px) {
+  .gem-input-card {
+    padding: 30px 36px;
+  }
+}
+
+.gem-input {
+  font-family: var(--hebrew);
+  font-size: 1.6rem;
+  text-align: right;
+}
+
+.gem-keyboard {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(42px, 1fr));
+  gap: 6px;
+}
+
+.gem-keyboard button {
+  font: 600 1.25rem var(--hebrew);
+  color: var(--ink);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--glass-brd);
+  border-radius: 10px;
+  padding: 8px 0;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.gem-keyboard button:hover {
+  border-color: var(--gold);
+  background: rgba(242, 207, 134, 0.1);
+}
+
+.gem-keyboard .gem-wide {
+  grid-column: span 2;
+  font: 600 0.85rem var(--sans);
+}
+
+.gem-empty {
+  text-align: center;
+}
+
+.gem-result {
+  padding: 24px 20px;
+  display: grid;
+  gap: 18px;
+}
+
+.gem-tiles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  justify-content: center;
+}
+
+.gem-tile b {
+  font-family: var(--hebrew);
+  font-size: 1.5rem;
+}
+
+.gem-values {
+  display: grid;
+  gap: 12px;
+}
+
+@media (min-width: 760px) {
+  .gem-values {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.gem-values > div {
+  padding: 14px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.035);
+  border: 1px solid var(--glass-brd);
+}
+
+.gem-values .note {
+  margin: 4px 0 0;
+}
+
+.gem-big {
+  margin: 0;
+  font: 700 2rem var(--display);
+  font-variant-numeric: lining-nums;
+  color: var(--gold);
+}
+
+.gem-letters h3 {
+  margin-bottom: 12px;
+}
+
+.gem-letter-grid {
+  display: grid;
+  gap: 12px;
+}
+
+@media (min-width: 760px) {
+  .gem-letter-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.gem-letter {
+  padding: 18px;
+}
+
+.gem-letter header {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.gem-letter h4 {
+  margin: 0;
+}
+
+.gem-letter .note {
+  margin: 0;
+}
+
+.gem-letter p {
+  color: var(--ink-soft);
+  font-size: 0.95rem;
+}
+
+.gem-letter p.gem-label {
+  margin: 14px 0 2px;
+  font-size: 0.7rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--gold);
+  font-weight: 600;
+}
+
+.gem-glyph {
+  font-family: var(--hebrew);
+  font-size: 2.2rem;
+  color: var(--gold);
+  min-width: 48px;
+  text-align: center;
+}
+
+@media print {
+  .gem-keyboard {
+    display: none;
+  }
+}
+
+/* ---------- Bloques de lectura ---------- */
+.part-group-start {
+  margin-top: 34px;
+}
+
+.part-group {
+  margin: 0 0 4px;
+  padding: 10px 0;
+  font: 600 0.8rem var(--sans);
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--gold);
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.part-group::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, rgba(242, 207, 134, 0.5), transparent);
+}
+
+.part-group-tag {
+  margin: 0 0 4px;
+  font-size: 0.7rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink-mute);
+  font-weight: 600;
+}
+
+.results-nav li.rn-new-group {
+  margin-left: 10px;
+  padding-left: 10px;
+  border-left: 1px solid var(--glass-brd);
+}
+
+/* Título de cada número: nivel h3 dentro de su parte, con el tamaño visual de antes */
+.ns-title {
+  font-size: clamp(1.9rem, 4.5vw, 2.8rem);
+}
+
+/* Zona táctil cómoda en el selector de idioma (≥ 40 px) */
+.lang button {
+  min-height: 36px;
+  min-width: 40px;
+  padding: 8px 12px;
+}
+
+@media (pointer: coarse) {
+  .lang button {
+    min-height: 40px;
+  }
+}
+
+/* Las rejillas de resultados nunca se ensanchan por su contenido (p. ej. el índice de partes,
+   que se desplaza en horizontal): la columna se limita al ancho disponible */
+.results,
+.part,
+.panel-grid,
+.hebrew-birth,
+.gematria,
+.purpose {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.results-nav,
+.results-nav ol {
+  min-width: 0;
+  max-width: 100vw;
+}

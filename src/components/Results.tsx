@@ -1,4 +1,4 @@
-import { useMemo, useState, type ReactNode } from 'react'
+import { Fragment, useMemo, useState, type ReactNode } from 'react'
 import type { Profile } from '../lib/numerology.ts'
 import type { PositionKey } from '../data/numerology.ts'
 import { NumberSection } from './NumberSection.tsx'
@@ -8,17 +8,26 @@ import { Purpose } from './Purpose.tsx'
 import { hebrewBirthDate } from '../lib/hebrewDate.ts'
 import { ResultsNav, type NavItem } from './ResultsNav.tsx'
 import { NameWords } from './NameWords.tsx'
+import { Gematria } from './Gematria.tsx'
 import { useLang } from '../i18n/lang.tsx'
 import { useContent } from '../i18n/data.ts'
 import { decozUrl } from '../data/decoz.ts'
 import { SourceList } from './SourceList.tsx'
 
 const ORDER: PositionKey[] = ['leccion', 'alma', 'personalidad', 'destino']
-const PART_IDS = ['parte-resumen', 'parte-numeros', 'parte-hebrea', 'parte-arbol', 'parte-nombre', 'parte-mision', 'parte-guardar']
+const PART_IDS = ['parte-resumen', 'parte-numeros', 'parte-hebrea', 'parte-arbol', 'parte-nombre', 'parte-guematria', 'parte-mision', 'parte-guardar']
+
+// Tres bloques de lectura: I. Numerología · II. Calendario hebreo y Kabbalah · III. Tu camino
+const DISPLAY = [0, 1, 4, 2, 5, 3, 6, 7]
+const GROUP_OF: Record<number, number> = { 0: 0, 1: 0, 4: 0, 2: 1, 5: 1, 3: 1, 6: 2, 7: 2 }
+const GROUPS = {
+  es: ['I · Numerología', 'II · Calendario hebreo y Kabbalah', 'III · Tu camino'],
+  en: ['I · Numerology', 'II · Hebrew calendar and Kabbalah', 'III · Your path'],
+}
 
 const UI = {
   es: {
-    nav: ['Resumen', 'Tus 4 números', 'Fecha hebrea', 'Árbol de la Vida', 'Tu nombre', 'Para qué viniste', 'Guardar'],
+    nav: ['Resumen', 'Tus 4 números', 'Fecha hebrea', 'Árbol de la Vida', 'Tu nombre', 'Guematría', 'Para qué viniste', 'Guardar'],
     map: 'Tu mapa numerológico',
     born: 'Fecha de nacimiento',
     parts: [
@@ -35,6 +44,10 @@ const UI = {
       [
         'Las letras de tu nombre',
         'El número propio de cada uno de tus nombres y apellidos, cuántas letras vibran en cada número y qué cualidades te pide desarrollar esta vida.',
+      ],
+      [
+        'Tu nombre en hebreo: guematría',
+        'La lectura cabalística de los números: el valor de las letras de tu nombre escrito en hebreo, con los cuatro métodos clásicos y el sentido de cada letra.',
       ],
       ['Para qué viniste', 'Lo que enseñan las fuentes judías sobre la misión de cada alma, y cómo se reflejan en tus propios números.'],
       ['Guarda tu resultado', 'Descárgalo como PDF o compártelo. Todo ocurre en tu dispositivo: no guardamos nada.'],
@@ -84,7 +97,7 @@ const UI = {
     shareTitle: 'Mi código numerológico',
   },
   en: {
-    nav: ['Summary', 'Your 4 numbers', 'Hebrew date', 'Tree of Life', 'Your name', 'Why you came', 'Save'],
+    nav: ['Summary', 'Your 4 numbers', 'Hebrew date', 'Tree of Life', 'Your name', 'Gematria', 'Why you came', 'Save'],
     map: 'Your numerology map',
     born: 'Date of birth',
     parts: [
@@ -101,6 +114,10 @@ const UI = {
       [
         'The letters of your name',
         'The number of each of your names and surnames, how many letters vibrate in each number and which qualities this life asks you to develop.',
+      ],
+      [
+        'Your name in Hebrew: gematria',
+        'The Kabbalistic reading of numbers: the value of the letters of your name written in Hebrew, with the four classical methods and the meaning of each letter.',
       ],
       ['Why you came', 'What Jewish sources teach about each soul’s mission, and how it is reflected in your own numbers.'],
       ['Save your result', 'Download it as a PDF or share it. Everything happens on your device: we store nothing.'],
@@ -153,11 +170,16 @@ const UI = {
 
 function Part({ index, title, intro, children }: { index: number; title: string; intro: string; children: ReactNode }) {
   const id = PART_IDS[index]
+  const slot = DISPLAY.indexOf(index)
+  const group = GROUPS[useLang().lang][GROUP_OF[index]]
+  const firstOfGroup = DISPLAY.findIndex((i) => GROUP_OF[i] === GROUP_OF[index]) === slot
   return (
-    <section className="part" id={id} aria-labelledby={`${id}-title`}>
+    <section className={`part${firstOfGroup ? ' part-group-start' : ''}`} id={id} aria-labelledby={`${id}-title`}>
+      {firstOfGroup && <p className="part-group">{group}</p>}
       <header className="part-header reveal">
-        <span className="part-num">{String(index + 1).padStart(2, '0')}</span>
+        <span className="part-num">{String(slot + 1).padStart(2, '0')}</span>
         <div>
+          <p className="part-group-tag">{group}</p>
           <h2 id={`${id}-title`}>{title}</h2>
           <p>{intro}</p>
         </div>
@@ -203,7 +225,7 @@ export function Results({ profile, onReset }: { profile: Profile; onReset: () =>
   const birth = new Intl.DateTimeFormat(lang, { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' }).format(
     new Date(Date.UTC(year, month - 1, day, 12)),
   )
-  const parts = PART_IDS.map((id, i): NavItem => ({ id, label: t.nav[i] }))
+  const parts = DISPLAY.map((i): NavItem => ({ id: PART_IDS[i], label: t.nav[i], group: GROUPS[lang][GROUP_OF[i]] }))
 
   const summary =
     `${profile.name} · ${birth}\n` +
@@ -223,6 +245,162 @@ export function Results({ profile, onReset }: { profile: Profile; onReset: () =>
     }
   }
 
+  const sections: ReactNode[] = [
+    <Part index={0} title={t.parts[0][0]} intro={t.parts[0][1]}>
+      <div className="orbs">
+        {ORDER.map((k, i) => (
+          <a key={k} href={`#sec-${k}`} className="orb-card" style={{ animationDelay: `${i * 120}ms` }}>
+            <span className="orb" data-n={values[k]}>
+              {shown(k)}
+            </span>
+            <span className="orb-title">{C.POSITIONS[k].title}</span>
+            <span className="orb-sub">{C.NUMBERS[values[k]].archetype}</span>
+          </a>
+        ))}
+      </div>
+      <div className="mini-stats">
+        <div className="mini glass">
+          <span className="mini-n">{profile.birthDay.value}</span>
+          <span>
+            <b>{t.dayNumber}</b>
+            <small>
+              {t.talent}: {C.NUMBERS[profile.birthDay.value].keywords.slice(0, 2).join(t.and).toLowerCase()}
+            </small>
+          </span>
+        </div>
+        <div className="mini glass">
+          <span className="mini-n">{profile.personalYear.value}</span>
+          <span>
+            <b>
+              {t.personalYear} {profile.personalYear.year}
+            </b>
+            <small>
+              {Y.archetype} · {t.personalHow} {profile.personalYear.year}
+            </small>
+          </span>
+        </div>
+        <div className="mini glass">
+          <span className="mini-n">{profile.universalYear.value}</span>
+          <span>
+            <b>
+              {t.universalYear} {profile.universalYear.year}
+            </b>
+            <small>
+              {C.NUMBERS[profile.universalYear.value].archetype} · {t.universalHow}
+            </small>
+          </span>
+        </div>
+      </div>
+      <p className="note mini-source">
+        {t.yearsSource}{' '}
+        <a href="https://www.worldnumerology.com/numerology-personal-year/" target="_blank" rel="noopener noreferrer">
+          Personal Year
+        </a>{' '}
+        ·{' '}
+        <a
+          href="https://www.worldnumerology.com/numerology-articles/2026-numerology-forecast-and-predictions.html"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Universal Year
+        </a>
+      </p>
+
+      <div className="synthesis glass reveal">
+        <p className="eyebrow">{t.synthesisEyebrow}</p>
+        <h3>
+          {t.synthesisFor} {firstName}
+        </h3>
+        <p>
+          {t.s1(values.leccion, L.archetype, L.essence)}
+          {t.challenge} {lowerFirst(L.lesson)}
+        </p>
+        <p>{t.s2(values.alma, A.essence, values.personalidad, P.keywords.slice(0, 2).join(t.and).toLowerCase())}</p>
+        <p>
+          {t.s3(profile.destiny.display)}
+          {lowerFirst(D.positions.destino)}
+        </p>
+        <p className="synthesis-year">
+          <strong>{t.s4(profile.personalYear.year, profile.personalYear.value)}</strong> {Y.year}
+        </p>
+        <SourceList
+          sources={[
+            { label: `Hans Decoz — Life Path ${values.leccion}`, url: decozUrl('lifePath', values.leccion) },
+            { label: `Hans Decoz — Personal Year`, url: decozUrl('personalYear', profile.personalYear.value) },
+          ]}
+        />
+      </div>
+    </Part>,
+    <Part index={1} title={t.parts[1][0]} intro={t.parts[1][1]}>
+      {ORDER.map((k, i) => (
+        <NumberSection key={k} profile={profile} position={k} result={results[k]} index={i + 1} />
+      ))}
+    </Part>,
+    <Part index={2} title={t.parts[2][0]} intro={t.parts[2][1]}>
+      <HebrewBirth date={profile.date} afterSunset={afterSunset} onAfterSunset={setAfterSunset} />
+    </Part>,
+    <Part
+      index={3}
+      title={t.parts[3][0]}
+      intro={t.tree(
+        Object.keys(marks)
+          .map((n) => C.SEFIROT[Number(n) - 1].name)
+          .join(', '),
+      )}
+    >
+      <div className="reveal">
+        <TreeOfLife marks={marks} initial={values.leccion} />
+      </div>
+    </Part>,
+    <Part index={4} title={t.parts[4][0]} intro={t.parts[4][1]}>
+      <NameWords words={profile.words} />
+      <div className="karmic glass reveal">
+        <div className="incl-grid">
+          {profile.inclusion.map((count, i) => (
+            <div key={i} className={`incl-cell${count === 0 ? ' missing' : ''}`}>
+              <span className="incl-n">{i + 1}</span>
+              <span className="incl-count">{count === 0 ? '—' : `×${count}`}</span>
+            </div>
+          ))}
+        </div>
+        <p className="section-intro">{t.karmicIntro}</p>
+        {profile.karmicLessons.length ? (
+          <ul className="karmic-list">
+            {profile.karmicLessons.map((n) => (
+              <li key={n}>
+                <b>
+                  {n} · {C.NUMBERS[n].archetype}:
+                </b>{' '}
+                {t.develop} {C.NUMBERS[n].keywords.slice(0, 3).join(', ').toLowerCase()}.
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p className="lead">{t.noKarmic}</p>
+        )}
+      </div>
+    </Part>,
+    <Part index={5} title={t.parts[5][0]} intro={t.parts[5][1]}>
+      <Gematria />
+    </Part>,
+    <Part index={6} title={t.parts[6][0]} intro={t.parts[6][1]}>
+      <Purpose profile={profile} hebrew={hebrew} />
+    </Part>,
+    <Part index={7} title={t.parts[7][0]} intro={t.parts[7][1]}>
+      <div className="actions">
+        <button className="btn btn-primary" onClick={() => window.print()}>
+          {t.pdf}
+        </button>
+        <button className="btn btn-ghost" onClick={share}>
+          {copied ? t.copied : t.share}
+        </button>
+        <button className="btn btn-ghost" onClick={onReset}>
+          {t.again}
+        </button>
+      </div>
+    </Part>,
+  ]
+
   return (
     <div className="results" id="resultados">
       <div className="summary reveal">
@@ -235,162 +413,9 @@ export function Results({ profile, onReset }: { profile: Profile; onReset: () =>
 
       <ResultsNav items={parts} />
 
-      <Part index={0} title={t.parts[0][0]} intro={t.parts[0][1]}>
-        <div className="orbs">
-          {ORDER.map((k, i) => (
-            <a key={k} href={`#sec-${k}`} className="orb-card" style={{ animationDelay: `${i * 120}ms` }}>
-              <span className="orb" data-n={values[k]}>
-                {shown(k)}
-              </span>
-              <span className="orb-title">{C.POSITIONS[k].title}</span>
-              <span className="orb-sub">{C.NUMBERS[values[k]].archetype}</span>
-            </a>
-          ))}
-        </div>
-        <div className="mini-stats">
-          <div className="mini glass">
-            <span className="mini-n">{profile.birthDay.value}</span>
-            <span>
-              <b>{t.dayNumber}</b>
-              <small>
-                {t.talent}: {C.NUMBERS[profile.birthDay.value].keywords.slice(0, 2).join(t.and).toLowerCase()}
-              </small>
-            </span>
-          </div>
-          <div className="mini glass">
-            <span className="mini-n">{profile.personalYear.value}</span>
-            <span>
-              <b>
-                {t.personalYear} {profile.personalYear.year}
-              </b>
-              <small>
-                {Y.archetype} · {t.personalHow} {profile.personalYear.year}
-              </small>
-            </span>
-          </div>
-          <div className="mini glass">
-            <span className="mini-n">{profile.universalYear.value}</span>
-            <span>
-              <b>
-                {t.universalYear} {profile.universalYear.year}
-              </b>
-              <small>
-                {C.NUMBERS[profile.universalYear.value].archetype} · {t.universalHow}
-              </small>
-            </span>
-          </div>
-        </div>
-        <p className="note mini-source">
-          {t.yearsSource}{' '}
-          <a href="https://www.worldnumerology.com/numerology-personal-year/" target="_blank" rel="noopener noreferrer">
-            Personal Year
-          </a>{' '}
-          ·{' '}
-          <a
-            href="https://www.worldnumerology.com/numerology-articles/2026-numerology-forecast-and-predictions.html"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Universal Year
-          </a>
-        </p>
-
-        <div className="synthesis glass reveal">
-          <p className="eyebrow">{t.synthesisEyebrow}</p>
-          <h3>
-            {t.synthesisFor} {firstName}
-          </h3>
-          <p>
-            {t.s1(values.leccion, L.archetype, L.essence)}
-            {t.challenge} {lowerFirst(L.lesson)}
-          </p>
-          <p>{t.s2(values.alma, A.essence, values.personalidad, P.keywords.slice(0, 2).join(t.and).toLowerCase())}</p>
-          <p>
-            {t.s3(profile.destiny.display)}
-            {lowerFirst(D.positions.destino)}
-          </p>
-          <p className="synthesis-year">
-            <strong>{t.s4(profile.personalYear.year, profile.personalYear.value)}</strong> {Y.year}
-          </p>
-          <SourceList
-            sources={[
-              { label: `Hans Decoz — Life Path ${values.leccion}`, url: decozUrl('lifePath', values.leccion) },
-              { label: `Hans Decoz — Personal Year`, url: decozUrl('personalYear', profile.personalYear.value) },
-            ]}
-          />
-        </div>
-      </Part>
-
-      <Part index={1} title={t.parts[1][0]} intro={t.parts[1][1]}>
-        {ORDER.map((k, i) => (
-          <NumberSection key={k} profile={profile} position={k} result={results[k]} index={i + 1} />
-        ))}
-      </Part>
-
-      <Part index={2} title={t.parts[2][0]} intro={t.parts[2][1]}>
-        <HebrewBirth date={profile.date} afterSunset={afterSunset} onAfterSunset={setAfterSunset} />
-      </Part>
-
-      <Part
-        index={3}
-        title={t.parts[3][0]}
-        intro={t.tree(
-          Object.keys(marks)
-            .map((n) => C.SEFIROT[Number(n) - 1].name)
-            .join(', '),
-        )}
-      >
-        <div className="reveal">
-          <TreeOfLife marks={marks} initial={values.leccion} />
-        </div>
-      </Part>
-
-      <Part index={4} title={t.parts[4][0]} intro={t.parts[4][1]}>
-        <NameWords words={profile.words} />
-        <div className="karmic glass reveal">
-          <div className="incl-grid">
-            {profile.inclusion.map((count, i) => (
-              <div key={i} className={`incl-cell${count === 0 ? ' missing' : ''}`}>
-                <span className="incl-n">{i + 1}</span>
-                <span className="incl-count">{count === 0 ? '—' : `×${count}`}</span>
-              </div>
-            ))}
-          </div>
-          <p className="section-intro">{t.karmicIntro}</p>
-          {profile.karmicLessons.length ? (
-            <ul className="karmic-list">
-              {profile.karmicLessons.map((n) => (
-                <li key={n}>
-                  <b>
-                    {n} · {C.NUMBERS[n].archetype}:
-                  </b>{' '}
-                  {t.develop} {C.NUMBERS[n].keywords.slice(0, 3).join(', ').toLowerCase()}.
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <p className="lead">{t.noKarmic}</p>
-          )}
-        </div>
-      </Part>
-
-      <Part index={5} title={t.parts[5][0]} intro={t.parts[5][1]}>
-        <Purpose profile={profile} hebrew={hebrew} />
-      </Part>
-
-      <Part index={6} title={t.parts[6][0]} intro={t.parts[6][1]}>
-        <div className="actions">
-          <button className="btn btn-primary" onClick={() => window.print()}>
-            {t.pdf}
-          </button>
-          <button className="btn btn-ghost" onClick={share}>
-            {copied ? t.copied : t.share}
-          </button>
-          <button className="btn btn-ghost" onClick={onReset}>
-            {t.again}
-          </button>
-        </div>
-      </Part>
+      {DISPLAY.map((i) => (
+        <Fragment key={i}>{sections[i]}</Fragment>
+      ))}
     </div>
   )
 }

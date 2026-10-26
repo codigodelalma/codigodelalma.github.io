@@ -33,7 +33,7 @@ const UI = {
     sefiraTitle: 'Sefirá',
     inTradition: (m: number) => `El ${m} en la tradición`,
     symbolic: (n: number) =>
-      `Correspondencia simbólica: el número ${n} se asocia aquí con la letra hebrea de valor ${n} (guematría) y con la ${n}.ª sefirá del Árbol de la Vida. La Kabbalah aplica la guematría a palabras hebreas; vincularla con nombres en alfabeto latino es una lectura interpretativa, no una enseñanza tradicional.`,
+      `Correspondencia simbólica: el número ${n} se asocia aquí con la letra hebrea de valor ${n} (guematría) y con la ${n}.ª sefirá del Árbol de la Vida. La Kabbalah aplica la guematría a palabras hebreas; vincularla con nombres en alfabeto latino es una lectura interpretativa, no una enseñanza tradicional. Para una guematría real, escribe tu nombre en hebreo en la parte «Guematría».`,
     inSources: (n: number) => `El número ${n} en las fuentes judías:`,
   },
   en: {
@@ -51,7 +51,7 @@ const UI = {
     sefiraTitle: 'Sefirah',
     inTradition: (m: number) => `${m} in the tradition`,
     symbolic: (n: number) =>
-      `Symbolic correspondence: the number ${n} is associated here with the Hebrew letter of value ${n} (gematria) and with the ${n}${n === 1 ? 'st' : n === 2 ? 'nd' : n === 3 ? 'rd' : 'th'} sefirah of the Tree of Life. Kabbalah applies gematria to Hebrew words; linking it to names in the Latin alphabet is an interpretive reading, not a traditional teaching.`,
+      `Symbolic correspondence: the number ${n} is associated here with the Hebrew letter of value ${n} (gematria) and with the ${n}${n === 1 ? 'st' : n === 2 ? 'nd' : n === 3 ? 'rd' : 'th'} sefirah of the Tree of Life. Kabbalah applies gematria to Hebrew words; linking it to names in the Latin alphabet is an interpretive reading, not a traditional teaching. For a real gematria, write your name in Hebrew in the “Gematria” part.`,
     inSources: (n: number) => `The number ${n} in Jewish sources:`,
   },
 }
@@ -90,7 +90,9 @@ export function NumberSection({ profile, position, result, index }: Props) {
           <p className="eyebrow">
             {String(index).padStart(2, '0')} · {pos.source}
           </p>
-          <h2 id={`${id}-title`}>{pos.title}</h2>
+          <h3 className="ns-title" id={`${id}-title`}>
+            {pos.title}
+          </h3>
           <p className="ns-archetype">
             {meaning.archetype}
             <span className="ns-hebrew" lang="he">
