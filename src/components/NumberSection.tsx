@@ -3,6 +3,14 @@ import type { Profile, Reduction } from '../lib/numerology.ts'
 import type { PositionKey } from '../data/numerology.ts'
 import { useLang } from '../i18n/lang.tsx'
 import { useContent } from '../i18n/data.ts'
+import { DECOZ_TITLE, decozUrl, type DecozKind } from '../data/decoz.ts'
+
+const POSITION_KIND: Record<PositionKey, DecozKind> = {
+  leccion: 'lifePath',
+  alma: 'soulUrge',
+  personalidad: 'personality',
+  destino: 'expression',
+}
 import { Breakdown } from './Breakdown.tsx'
 import { SourceList } from './SourceList.tsx'
 
@@ -119,6 +127,14 @@ export function NumberSection({ profile, position, result, index }: Props) {
         {tab === 'num' && (
           <div className="panel-grid">
             <p className="lead">{meaning.positions[position]}</p>
+            <SourceList
+              sources={[
+                {
+                  label: `Hans Decoz — ${DECOZ_TITLE[POSITION_KIND[position]]} ${n}`,
+                  url: decozUrl(POSITION_KIND[position], n),
+                },
+              ]}
+            />
             <div className="duo">
               <div className="duo-card light">
                 <h4>{t.light}</h4>
@@ -133,6 +149,7 @@ export function NumberSection({ profile, position, result, index }: Props) {
               <h4>{t.lesson}</h4>
               <p>{meaning.lesson}</p>
             </div>
+            <SourceList sources={[{ label: `Hans Decoz — Life Path ${n}`, url: decozUrl('lifePath', n) }]} />
             {vocation && (
               <div className="duo-card">
                 <h4>

@@ -10,6 +10,8 @@ import { ResultsNav, type NavItem } from './ResultsNav.tsx'
 import { NameWords } from './NameWords.tsx'
 import { useLang } from '../i18n/lang.tsx'
 import { useContent } from '../i18n/data.ts'
+import { decozUrl } from '../data/decoz.ts'
+import { SourceList } from './SourceList.tsx'
 
 const ORDER: PositionKey[] = ['leccion', 'alma', 'personalidad', 'destino']
 const PART_IDS = ['parte-resumen', 'parte-numeros', 'parte-hebrea', 'parte-arbol', 'parte-nombre', 'parte-mision', 'parte-guardar']
@@ -48,6 +50,7 @@ const UI = {
     yearsSource: 'Año personal y año universal según Hans Decoz:',
     and: ' y ',
     synthesisEyebrow: 'Tu lección de vida en breve',
+    challenge: 'Tu reto:',
     synthesisFor: 'Síntesis para',
     s1: (n: number, arch: string, essence: string) => (
       <>
@@ -113,6 +116,7 @@ const UI = {
     yearsSource: 'Personal year and universal year according to Hans Decoz:',
     and: ' and ',
     synthesisEyebrow: 'Your life lesson in brief',
+    challenge: 'Your challenge:',
     synthesisFor: 'Summary for',
     s1: (n: number, arch: string, essence: string) => (
       <>
@@ -298,7 +302,7 @@ export function Results({ profile, onReset }: { profile: Profile; onReset: () =>
           </h3>
           <p>
             {t.s1(values.leccion, L.archetype, L.essence)}
-            {L.lesson}
+            {t.challenge} {lowerFirst(L.lesson)}
           </p>
           <p>{t.s2(values.alma, A.essence, values.personalidad, P.keywords.slice(0, 2).join(t.and).toLowerCase())}</p>
           <p>
@@ -308,6 +312,12 @@ export function Results({ profile, onReset }: { profile: Profile; onReset: () =>
           <p className="synthesis-year">
             <strong>{t.s4(profile.personalYear.year, profile.personalYear.value)}</strong> {Y.year}
           </p>
+          <SourceList
+            sources={[
+              { label: `Hans Decoz — Life Path ${values.leccion}`, url: decozUrl('lifePath', values.leccion) },
+              { label: `Hans Decoz — Personal Year`, url: decozUrl('personalYear', profile.personalYear.value) },
+            ]}
+          />
         </div>
       </Part>
 

@@ -2,6 +2,8 @@ import type { WordInfo } from '../lib/numerology.ts'
 import { reduce } from '../lib/numerology.ts'
 import { useLang } from '../i18n/lang.tsx'
 import { useContent } from '../i18n/data.ts'
+import { decozUrl } from '../data/decoz.ts'
+import { SourceList } from './SourceList.tsx'
 
 const UI = {
   es: {
@@ -84,6 +86,7 @@ export function NameWords({ words }: { words: WordInfo[] }) {
                 <li key={k}>{k}</li>
               ))}
             </ul>
+            <SourceList sources={[{ label: `Hans Decoz — Life Path ${n}`, url: decozUrl('lifePath', n) }]} />
             <p className="name-sum">
               {t.check} {w.letters.map((l) => l.value).join(' + ')} ={' '}
               <strong>{w.total.chain.join(' → ')}</strong>
