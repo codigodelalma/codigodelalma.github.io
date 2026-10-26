@@ -3,6 +3,9 @@ import { PYTHAGOREAN_TABLE } from '../lib/numerology.ts'
 import { useLang } from '../i18n/lang.tsx'
 import { useContent } from '../i18n/data.ts'
 
+// Artículo de Hans Decoz sobre la Y (verificado el 26/10/2026)
+const Y_DECOZ = 'https://www.worldnumerology.com/numerology-articles/numerology-Y-vowel-consonant.html'
+
 const UI: Record<'es' | 'en', { eyebrow: string; title: string; table: string; tableText: string; four: string; steps: ReactNode[]; y: ReactNode; three: string; views: ReactNode[]; sources: string; disclaimer: string }> = {
   es: {
     eyebrow: 'Metodología',
@@ -28,7 +31,15 @@ const UI: Record<'es' | 'en', { eyebrow: string; title: string; table: string; t
     y: (
       <>
         La <b>Y</b> cuenta como vocal cuando suena como «i» (al final de palabra o antes de consonante: Godoy, Mayra) y como
-        consonante antes de vocal (Yolanda). Si en el camino aparece 11, 22 o 33, se señala como vibración maestra.
+        consonante antes de vocal (Yolanda). Es la regla de Matthew Oliver Goodwin (<i>Numerology: The Complete Guide</i>,
+        1981): la Y es vocal cuando no hay otra vocal en la sílaba y también cuando sigue a una vocal y suena junto con
+        ella, como en Doyle. Otros autores la cuentan distinto:{' '}
+        <a href={Y_DECOZ} target="_blank" rel="noopener noreferrer">
+          Hans Decoz
+        </a>{' '}
+        la toma como consonante cuando va unida a otra vocal, y Juno Jordan nunca la incluye en el alma. Solo cambian el
+        alma y la personalidad; el destino es el mismo. Si en el camino aparece 11, 22 o 33, se señala como vibración
+        maestra.
       </>
     ),
     three: 'Tres miradas, bien distinguidas',
@@ -74,7 +85,15 @@ const UI: Record<'es' | 'en', { eyebrow: string; title: string; table: string; t
     y: (
       <>
         <b>Y</b> counts as a vowel when it sounds like “i” (at the end of a word or before a consonant: Godoy, Mayra) and as a
-        consonant before a vowel (Yolanda). If 11, 22 or 33 appears along the way, it is marked as a master vibration.
+        consonant before a vowel (Yolanda). This is Matthew Oliver Goodwin’s rule (<i>Numerology: The Complete Guide</i>,
+        1981): Y is a vowel when there is no other vowel in the syllable, and also when it follows a vowel and is sounded
+        with it, as in Doyle. Other authors count it differently:{' '}
+        <a href={Y_DECOZ} target="_blank" rel="noopener noreferrer">
+          Hans Decoz
+        </a>{' '}
+        treats it as a consonant when it is coupled with another vowel, and Juno Jordan never includes it in the soul. Only
+        the soul and personality change; the destiny stays the same. If 11, 22 or 33 appears along the way, it is marked as
+        a master vibration.
       </>
     ),
     three: 'Three perspectives, clearly distinguished',

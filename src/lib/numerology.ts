@@ -65,6 +65,8 @@ function baseLetter(ch: string): string {
 /**
  * La Y cuenta como vocal cuando suena como "i": al final de la palabra
  * (Godoy, Rey) o antes de consonante (Mayra). Es consonante antes de vocal (Yolanda, Reyes).
+ * Coincide con Matthew Oliver Goodwin, Numerology: The Complete Guide (1981): vocal si no hay otra vocal
+ * en la sílaba o si sigue a una vocal y suena con ella (Doyle). Decoz la cuenta como consonante en ese caso.
  */
 function isVowel(letters: string[], i: number): boolean {
   const ch = letters[i]

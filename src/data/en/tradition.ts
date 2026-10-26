@@ -344,6 +344,7 @@ export const GENERAL_SOURCES: Source[] = [
   { label: 'Encyclopaedia Britannica — Numerology', url: 'https://www.britannica.com/topic/numerology' },
   { label: 'L. Dow Balliett, The Philosophy of Numbers (1908) — origin of modern “Pythagorean” numerology' },
   { label: 'Juno Jordan, Numerology: The Romance in Your Name (1965)' },
+  { label: 'Matthew Oliver Goodwin, Numerology: The Complete Guide, vol. 1 (1981) — rule for Y' },
   { label: 'Hans Decoz, Numerology: Key to Your Inner Self (1994)' },
   { label: 'Underwood Dudley, Numerology, or What Pythagoras Wrought (1997) — a critical view' },
 ]
